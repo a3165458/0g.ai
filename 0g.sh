@@ -233,7 +233,8 @@ evmosd tx staking create-validator \
 function install_storage_node() {
 
     sudo apt-get update
-    sudo apt-get install clang cmake build-essential screen -y
+    sudo apt-get install clang cmake build-essential screen cargo -y
+
 
 # 安装Go
     sudo rm -rf /usr/local/go
