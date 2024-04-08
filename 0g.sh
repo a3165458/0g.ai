@@ -230,7 +230,34 @@ evmosd tx staking create-validator \
 
 }
 
+function install_storage_node() {
 
+    sudo apt-get update
+    sudo apt-get install clang cmake build-essential screen -y
+
+# 安装Go
+    sudo rm -rf /usr/local/go
+    curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local
+    echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> $HOME/.bash_profile
+    export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
+    source $HOME/.bash_profile
+
+    
+# 克隆仓库
+git clone https://github.com/0glabs/0g-storage-node.git
+
+#进入对应目录构建
+cd 0g-storage-node
+git submodule update --init
+
+# 构建代码
+cargo build --release
+
+#后台运行
+cd run
+screen -dmS zgs_node_session ../target/release/zgs_node --config config.toml
+
+}
 
 # 主菜单
 function main_menu() {
@@ -252,6 +279,7 @@ function main_menu() {
         echo "8. 卸载节点"
         echo "9. 设置快捷键"  
         echo "10. 创建验证者"  
+        echo "11. 创建存储节点"  
         read -p "请输入选项（1-10）: " OPTION
 
         case $OPTION in
@@ -265,6 +293,7 @@ function main_menu() {
         8) uninstall_node ;;
         9) check_and_set_alias ;;
         10) add_validator ;;
+        11) install_storage_node ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
