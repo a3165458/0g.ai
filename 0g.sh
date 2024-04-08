@@ -282,7 +282,7 @@ function main_menu() {
         echo "9. 设置快捷键"  
         echo "10. 创建验证者"  
         echo "11. 创建存储节点"  
-        read -p "请输入选项（1-10）: " OPTION
+        read -p "请输入选项（1-11）: " OPTION
 
         case $OPTION in
         1) install_node ;;
