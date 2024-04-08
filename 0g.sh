@@ -258,6 +258,7 @@ cd run
 screen -dmS zgs_node_session ../target/release/zgs_node --config config.toml
 
 echo '====================== 安装完成 ==========================='
+echo '===进入对应路径:/0g-storage-node/run/log，使用tail -f logs文件名，查看logs 即可========================'
 
 }
 
