@@ -126,12 +126,12 @@ function install_node() {
     
 }
 
-# 查看Artela 服务状态
+# 查看0gai 服务状态
 function check_service_status() {
     pm2 list
 }
 
-# Artela 节点日志查询
+# 0gai 节点日志查询
 function view_logs() {
     pm2 logs evmosd
 }
@@ -195,7 +195,7 @@ function add_validator() {
 
 EOF
 evmosd tx staking create-validator validator.json --from $wallet_name  \
---chain-id=artela_11822-1 \
+--chain-id=0gai_11822-1 \
 --min-self-delegation=1 \
 --from=wallet \
 --gas-prices=99999aevmos \
