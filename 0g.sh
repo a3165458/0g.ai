@@ -121,6 +121,34 @@ function install_node() {
     # 使用 PM2 启动节点进程
     pm2 start evmosd -- start && pm2 save && pm2 startup
 
+
+
+    # 使用 pm2 停止 ogd 服务
+    pm2 stop evmosd
+
+    # 下载最新的快照
+    wget https://rpc-zero-gravity-testnet.trusted-point.com/latest_snapshot.tar.lz4
+
+    # 备份当前的验证者状态文件
+    cp $HOME/.evmosd/data/priv_validator_state.json $HOME/.evmosd/priv_validator_state.json.backup
+
+    # 重置数据目录同时保留地址簿
+    evmosd tendermint unsafe-reset-all --home $HOME/.evmosd --keep-addr-book
+
+    # 将快照解压直接到 .evmosd 目录
+    lz4 -d -c ./latest_snapshot.tar.lz4 | tar -xf - -C $HOME/.evmosd
+
+    # 恢复验证者状态文件的备份
+    mv $HOME/.evmosd/priv_validator_state.json.backup $HOME/.evmosd/data/priv_validator_state.json
+
+    # 使用 pm2 重启 evmosd 服务并跟踪日志
+    pm2 restart evmosd
+    pm2 logs evmosd
+
+    # 检查节点的同步状态
+    evmosd status | jq .SyncInfo
+
+
     echo '====================== 安装完成 ==========================='
     echo '安装完成请重新连接VPS，以启用对应快捷键功能'
     
