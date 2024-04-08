@@ -257,6 +257,8 @@ cargo build --release
 cd run
 screen -dmS zgs_node_session ../target/release/zgs_node --config config.toml
 
+echo '====================== 安装完成 ==========================='
+
 }
 
 # 主菜单
