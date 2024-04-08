@@ -205,30 +205,28 @@ function check_sync_status() {
 
 # 创建验证者
 function add_validator() {
-    pubkey=$(evmosd tendermint show-validator)
-    read -p "请输入您的钱包名称: " wallet_name
-    read -p "请输入您想设置的验证者的名字: " validator_name
-    read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
-    sudo tee ~/validator.json >> /dev/null <<EOF
-{
-  "pubkey": ${PUBKEY},
-  "amount": "10000000000000000aevmos",
-  "moniker": "$validator_name",
-  "details": "$details",
-  "commission-rate": "0.1",
-  "commission-max-rate": "0.2",
-  "commission-max-change-rate": "0.01",
-  "min-self-delegation": "1"
-}
 
-EOF
-evmosd tx staking create-validator validator.json --from $wallet_name  \
---chain-id=0gai_11822-1 \
---min-self-delegation=1 \
---from=wallet \
---gas-prices=99999aevmos \
---gas-adjustment=1.5 \
---gas=auto \
+read -p "请输入您的钱包名称: " wallet_name
+read -p "请输入您想设置的验证者的名字: " validator_name
+read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
+
+
+evmosd tx staking create-validator \
+  --amount=10000000000000000aevmos \
+  --pubkey=$(evmosd tendermint show-validator) \
+  --moniker=$validator_name \
+  --chain-id=zgtendermint_9000-1 \
+  --commission-rate=0.05 \
+  --commission-max-rate=0.10 \
+  --commission-max-change-rate=0.01 \
+  --min-self-delegation=1 \
+  --from=$wallet_name \
+  --identity="" \
+  --website="" \
+  --details="$details" \
+  --gas=500000 \
+  --gas-prices=99999aevmos \
+  -y
 
 }
 
