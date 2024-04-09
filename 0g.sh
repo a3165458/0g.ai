@@ -67,7 +67,7 @@ function install_node() {
 
     # 检查curl是否安装，如果没有则安装
     if ! command -v curl > /dev/null; then
-        sudo apt update && sudo apt install curl -y
+        sudo apt update && sudo apt install curl git -y
     fi
 
     # 设置变量
@@ -233,7 +233,7 @@ evmosd tx staking create-validator \
 function install_storage_node() {
 
     sudo apt-get update
-    sudo apt-get install clang cmake build-essential screen cargo -y
+    sudo apt-get install clang cmake build-essential git screen cargo -y
 
 
 # 安装Go
