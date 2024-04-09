@@ -290,7 +290,8 @@ function main_menu() {
         echo "9. 设置快捷键"  
         echo "10. 创建验证者"  
         echo "11. 创建存储节点"  
-        read -p "请输入选项（1-11）: " OPTION
+        echo "11. 给自己验证者地址质押代币"
+        read -p "请输入选项（1-12）: " OPTION
 
         case $OPTION in
         1) install_node ;;
@@ -304,6 +305,7 @@ function main_menu() {
         9) check_and_set_alias ;;
         10) add_validator ;;
         11) install_storage_node ;;
+        12) delegate_self_validator
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
