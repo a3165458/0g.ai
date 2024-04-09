@@ -263,6 +263,49 @@ echo '===进入对应路径:/0g-storage-node/run/log，使用tail -f logs文件�
 
 }
 
+
+function install_storage_kv() {
+
+# 克隆仓库
+git clone https://github.com/0glabs/0g-storage-kv.git
+
+
+#进入对应目录构建
+cd 0g-storage-kv
+git submodule update --init
+
+# 构建代码
+cargo build --release
+
+#后台运行
+cd run
+
+echo "请输入 blockchain_rpc_endpoint 的值: "
+read blockchain_rpc_endpoint
+
+cat > config.toml <<EOF
+stream_ids = ["000000000000000000000000000000000000000000000000000000000000f2bd", "000000000000000000000000000000000000000000000000000000000000f009", "00000000000000000000000000"]
+
+db_dir = "db"
+kv_db_dir = "kv.DB"
+
+rpc_enabled = true
+rpc_listen_address = "127.0.0.1:6789"
+zgs_node_urls = "http://127.0.0.1:5678"
+
+log_config_file = "log_config"
+
+blockchain_rpc_endpoint = "$blockchain_rpc_endpoint"
+log_contract_address = "0x22C1CaF8cbb671F220789184fda68BfD7eaA2eE1"
+log_sync_start_block_number = 670000
+
+EOF
+
+echo "配置已成功写入 config.toml 文件"
+screen -dmS storage_kv ../target/release/zgs_kv --config config.toml
+
+}
+
 # 给自己地址验证者质押
 function delegate_self_validator() {
 read -p "请输入质押代币数量: " math
@@ -292,7 +335,8 @@ function main_menu() {
         echo "9. 设置快捷键"  
         echo "10. 创建验证者"  
         echo "11. 创建存储节点"  
-        echo "12. 给自己验证者地址质押代币"
+        echo "12. 创建存储KV节点"  
+        echo "13. 给自己验证者地址质押代币"
         read -p "请输入选项（1-12）: " OPTION
 
         case $OPTION in
@@ -307,7 +351,8 @@ function main_menu() {
         9) check_and_set_alias ;;
         10) add_validator ;;
         11) install_storage_node ;;
-        12) delegate_self_validator ;;
+        12) install_storage_kv
+        13) delegate_self_validator ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
