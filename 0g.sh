@@ -292,7 +292,7 @@ function main_menu() {
         echo "9. 设置快捷键"  
         echo "10. 创建验证者"  
         echo "11. 创建存储节点"  
-        echo "11. 给自己验证者地址质押代币"
+        echo "12. 给自己验证者地址质押代币"
         read -p "请输入选项（1-12）: " OPTION
 
         case $OPTION in
