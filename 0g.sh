@@ -305,7 +305,7 @@ function main_menu() {
         9) check_and_set_alias ;;
         10) add_validator ;;
         11) install_storage_node ;;
-        12) delegate_self_validator
+        12) delegate_self_validator ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
