@@ -351,7 +351,7 @@ function main_menu() {
         9) check_and_set_alias ;;
         10) add_validator ;;
         11) install_storage_node ;;
-        12) install_storage_kv
+        12) install_storage_kv ;;
         13) delegate_self_validator ;;
         *) echo "无效选项。" ;;
         esac
