@@ -263,6 +263,12 @@ echo '===进入对应路径:/0g-storage-node/run/log，使用tail -f logs文件�
 
 }
 
+# 给自己地址验证者质押
+function delegate_self_validator() {
+read -p "请输入质押代币数量: " math
+read -p "请输入钱包名称: " wallet_name
+evmosd tx staking delegate $(evmosd keys show wallet --bech val -a)  ${math}evmos --from $wallet_name --gas=500000 --gas-prices=99999aevmos -y
+
 # 主菜单
 function main_menu() {
     while true; do
