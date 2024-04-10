@@ -77,7 +77,7 @@ function install_node() {
     # 获取初始文件和地址簿
     cd $HOME
     evmosd init $MONIKER --chain-id zgtendermint_9000-1
-    evmosd config chain-id $CHAIN_ID
+    evmosd config chain-id zgtendermint_9000-1
     evmosd config node tcp://localhost:26657
     evmosd config keyring-backend os 
 
