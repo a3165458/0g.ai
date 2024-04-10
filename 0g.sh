@@ -323,8 +323,7 @@ function main_menu() {
         echo "8. 卸载节点"
         echo "9. 创建验证者"  
         echo "10. 创建存储节点"  
-        echo "11. 创建存储KV节点（非必要，可以不用安装）"  
-        echo "12. 给自己验证者地址质押代币"
+        echo "11. 给自己验证者地址质押代币"
         read -p "请输入选项（1-12）: " OPTION
 
         case $OPTION in
@@ -338,8 +337,7 @@ function main_menu() {
         8) uninstall_node ;;
         9) add_validator ;;
         10) install_storage_node ;;
-        11) install_storage_kv ;;
-        12) delegate_self_validator ;;
+        11) delegate_self_validator ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
