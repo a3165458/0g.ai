@@ -322,7 +322,7 @@ function main_menu() {
         echo "9. 创建验证者"  
         echo "10. 创建存储节点"  
         echo "11. 给自己验证者地址质押代币"
-        read -p "请输入选项（1-12）: " OPTION
+        read -p "请输入选项（1-11）: " OPTION
 
         case $OPTION in
         1) install_node ;;
