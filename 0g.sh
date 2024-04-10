@@ -231,6 +231,19 @@ cargo build --release
 
 #后台运行
 cd run
+
+echo "请输入矿工的EVM钱包地址: "
+read minerid
+
+echo "请输入矿工的EVM钱包私钥，不要有0X: "
+read minerkey
+
+cat >> config.toml <<EOF
+miner_key ="$minerkey"
+miner_id ="$minerid"
+EOF
+
+
 screen -dmS zgs_node_session ../target/release/zgs_node --config config.toml
 
 echo '====================== 安装完成 ==========================='
@@ -258,11 +271,6 @@ cd run
 echo "请输入RPC节点信息: "
 read blockchain_rpc_endpoint
 
-echo "请输入矿工的EVM钱包地址: "
-read minerid
-
-echo "请输入矿工的EVM钱包私钥，不要有0X: "
-read minerkey
 
 cat > config.toml <<EOF
 stream_ids = ["000000000000000000000000000000000000000000000000000000000000f2bd", "000000000000000000000000000000000000000000000000000000000000f009", "00000000000000000000000000"]
@@ -279,8 +287,6 @@ log_config_file = "log_config"
 blockchain_rpc_endpoint = "$blockchain_rpc_endpoint"
 log_contract_address = "0x22C1CaF8cbb671F220789184fda68BfD7eaA2eE1"
 log_sync_start_block_number = 670000
-miner_key ="$minerkey"
-miner_id ="$minerid"
 
 EOF
 
