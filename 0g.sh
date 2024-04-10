@@ -70,14 +70,13 @@ function install_node() {
 
     # 配置evmosd
     echo 'export MONIKER="My_Node"' >> ~/.bash_profile
-    echo 'export CHAIN_ID="zgtendermint_9000-1"' >> ~/.bash_profile
     echo 'export WALLET_NAME="wallet"' >> ~/.bash_profile
     echo 'export RPC_PORT="26657"' >> ~/.bash_profile
     source $HOME/.bash_profile
 
     # 获取初始文件和地址簿
     cd $HOME
-    evmosd init $MONIKER --chain-id $CHAIN_ID
+    evmosd init $MONIKER --chain-id zgtendermint_9000-1
     evmosd config chain-id $CHAIN_ID
     evmosd config node tcp://localhost:$RPC_PORT
     evmosd config keyring-backend os 
