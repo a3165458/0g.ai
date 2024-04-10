@@ -261,7 +261,7 @@ read blockchain_rpc_endpoint
 echo "请输入矿工的EVM钱包地址: "
 read minerid
 
-echo "请输入矿工的私钥: "
+echo "请输入矿工的EVM钱包私钥，不要有0X: "
 read minerkey
 
 cat > config.toml <<EOF
