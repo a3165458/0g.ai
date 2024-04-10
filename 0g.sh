@@ -35,30 +35,6 @@ function install_pm2() {
     fi
 }
 
-# 自动设置快捷键的功能
-function check_and_set_alias() {
-    local alias_name="0g"
-    local shell_rc="$HOME/.bashrc"
-
-    # 对于Zsh用户，使用.zshrc
-    if [ -n "$ZSH_VERSION" ]; then
-        shell_rc="$HOME/.zshrc"
-    elif [ -n "$BASH_VERSION" ]; then
-        shell_rc="$HOME/.bashrc"
-    fi
-
-    # 检查快捷键是否已经设置
-    if ! grep -q "$alias_name" "$shell_rc"; then
-        echo "设置快捷键 '$alias_name' 到 $shell_rc"
-        echo "alias $alias_name='bash $SCRIPT_PATH'" >> "$shell_rc"
-        # 添加提醒用户激活快捷键的信息
-        echo "快捷键 '$alias_name' 已设置。请运行 'source $shell_rc' 来激活快捷键，或重新打开终端。"
-    else
-        # 如果快捷键已经设置，提供一个提示信息
-        echo "快捷键 '$alias_name' 已经设置在 $shell_rc。"
-        echo "如果快捷键不起作用，请尝试运行 'source $shell_rc' 或重新打开终端。"
-    fi
-}
 
 # 节点安装功能
 function install_node() {
@@ -332,11 +308,10 @@ function main_menu() {
         echo "6. 查看当前服务状态"
         echo "7. 运行日志查询"
         echo "8. 卸载节点"
-        echo "9. 设置快捷键"  
-        echo "10. 创建验证者"  
-        echo "11. 创建存储节点"  
-        echo "12. 创建存储KV节点"  
-        echo "13. 给自己验证者地址质押代币"
+        echo "9. 创建验证者"  
+        echo "10. 创建存储节点"  
+        echo "11. 创建存储KV节点"  
+        echo "12. 给自己验证者地址质押代币"
         read -p "请输入选项（1-12）: " OPTION
 
         case $OPTION in
@@ -348,11 +323,10 @@ function main_menu() {
         6) check_service_status ;;
         7) view_logs ;;
         8) uninstall_node ;;
-        9) check_and_set_alias ;;
-        10) add_validator ;;
-        11) install_storage_node ;;
-        12) install_storage_kv ;;
-        13) delegate_self_validator ;;
+        9) add_validator ;;
+        10) install_storage_node ;;
+        11) install_storage_kv ;;
+        12) delegate_self_validator ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
