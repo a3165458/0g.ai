@@ -232,15 +232,13 @@ cargo build --release
 #后台运行
 cd run
 
-echo "请输入矿工的EVM钱包地址，不要有0X: "
-read minerid
 
 echo "请输入矿工的EVM钱包私钥，不要有0X: "
 read minerkey
 
 cat >> config.toml <<EOF
 miner_key ="$minerkey"
-miner_id ="$minerid"
+miner_id=$(echo -n "string" | sha256sum | cut -d' ' -f1)
 EOF
 
 
