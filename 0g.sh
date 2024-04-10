@@ -232,7 +232,7 @@ cargo build --release
 #后台运行
 cd run
 
-echo "请输入矿工的EVM钱包地址: "
+echo "请输入矿工的EVM钱包地址，不要有0X: "
 read minerid
 
 echo "请输入矿工的EVM钱包私钥，不要有0X: "
