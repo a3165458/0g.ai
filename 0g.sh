@@ -237,8 +237,8 @@ echo "请输入矿工的EVM钱包私钥，不要有0X: "
 read minerkey
 
 cat >> config.toml <<EOF
-miner_key ="$minerkey"
-miner_id=$(echo -n "string" | sha256sum | cut -d' ' -f1)
+miner_key = "$minerkey"
+miner_id = $(echo -n "string" | sha256sum | cut -d' ' -f1)
 EOF
 
 
