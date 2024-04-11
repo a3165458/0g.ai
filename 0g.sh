@@ -301,6 +301,12 @@ evmosd tx staking delegate $(evmosd keys show wallet --bech val -a)  ${math}evmo
 
 }
 
+# 查看存储节点同步状态
+function check_storage_status() {
+    tail -f "$(find ~/0g-storage-node/run/log/ -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d' ' -f2-)"
+}
+
+
 # 主菜单
 function main_menu() {
     while true; do
@@ -321,7 +327,8 @@ function main_menu() {
         echo "8. 卸载节点"
         echo "9. 创建验证者"  
         echo "10. 创建存储节点"  
-        echo "11. 给自己验证者地址质押代币"
+        echo "11. 查看存储节点日志"  
+        echo "12. 给自己验证者地址质押代币"
         read -p "请输入选项（1-11）: " OPTION
 
         case $OPTION in
@@ -335,7 +342,8 @@ function main_menu() {
         8) uninstall_node ;;
         9) add_validator ;;
         10) install_storage_node ;;
-        11) delegate_self_validator ;;
+        11) check_storage_status ;;
+        12) delegate_self_validator ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
