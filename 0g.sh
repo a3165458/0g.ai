@@ -235,7 +235,7 @@ cd run
 echo "请输入矿工的EVM钱包私钥，不要有0X: "
 read minerkey
 
-cat > config.toml <<EOF
+cat >> config.toml <<EOF
 miner_key = "$minerkey"
 miner_id = "$(openssl rand -hex 32)"
 EOF
