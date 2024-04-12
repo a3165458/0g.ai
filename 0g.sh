@@ -141,7 +141,7 @@ function uninstall_node() {
         [yY][eE][sS]|[yY]) 
             echo "开始卸载节点程序..."
             pm2 stop evmosd && pm2 delete evmosd
-            rm -rf $HOME/.evmosd $HOME/evmos $(which evmosd)
+            rm -rf $HOME/.evmosd $HOME/evmos $(which evmosd) && rm -rf 0g-evmos
             echo "节点程序卸载完成。"
             ;;
         *)
