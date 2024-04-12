@@ -67,6 +67,10 @@ function install_node() {
     make install
     evmosd version
 
+    # 配置evmosd
+    export MONIKER="My_Node"
+    export WALLET_NAME="wallet"
+
     # 获取初始文件和地址簿
     cd $HOME
     evmosd init $MONIKER --chain-id zgtendermint_9000-1
