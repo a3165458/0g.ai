@@ -67,12 +67,6 @@ function install_node() {
     make install
     evmosd version
 
-    # 配置evmosd
-    echo 'export MONIKER="My_Node"' >> ~/.bash_profile
-    echo 'export WALLET_NAME="wallet"' >> ~/.bash_profile
-
-    source $HOME/.bash_profile
-
     # 获取初始文件和地址簿
     cd $HOME
     evmosd init $MONIKER --chain-id zgtendermint_9000-1
@@ -158,12 +152,14 @@ function uninstall_node() {
 
 # 创建钱包
 function add_wallet() {
-    evmosd keys add wallet
+    read -p "请输入你想设置的钱包名称: " wallet_name
+    evmosd keys add $wallet_name
 }
 
 # 导入钱包
 function import_wallet() {
-    evmosd keys add wallet --recover
+    read -p "请输入你想设置的钱包名称: " wallet_name
+    evmosd keys add $wallet_name --recover
 }
 
 # 查询余额
