@@ -232,13 +232,12 @@ cargo build --release
 cd run
 
 
-echo "请输入矿工的EVM钱包私钥，不要有0X: "
-read minerkey
+read -p "请输入你想导入的EVM钱包私钥，不要有0x: " minerkey
 
-cat >> config.toml <<EOF
-miner_key = "$minerkey"
-miner_id = "$(openssl rand -hex 32)"
-EOF
+sed -i "s/# miner_id = \"<hex64_without_0x_prefix>\"/miner_id = \"$(openssl rand -hex 32)\"/" config.toml
+sed -i "s/# miner_key = \"\"/miner_key = \"$minerkey\"/" config.toml
+
+
 
 
 screen -dmS zgs_node_session ../target/release/zgs_node --config config.toml
