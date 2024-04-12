@@ -99,7 +99,7 @@ function install_node() {
     pm2 stop evmosd
 
     # 下载最新的快照
-    wget https://rpc-zero-gravity-testnet.trusted-point.com/latest_snapshot.tar.lz4
+    wget -O latest_snapshot.tar.lz4 https://rpc-zero-gravity-testnet.trusted-point.com/latest_snapshot.tar.lz4
 
     # 备份当前的验证者状态文件
     cp $HOME/.evmosd/data/priv_validator_state.json $HOME/.evmosd/priv_validator_state.json.backup
