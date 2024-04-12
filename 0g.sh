@@ -238,7 +238,7 @@ read minerkey
 
 cat >> config.toml <<EOF
 miner_key = "$minerkey"
-miner_id = "$(echo -n "string" | sha256sum | cut -d' ' -f1)"
+miner_id = "$(openssl rand -hex 32)"
 EOF
 
 
