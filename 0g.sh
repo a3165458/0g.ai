@@ -58,7 +58,6 @@ function install_node() {
     sudo rm -rf /usr/local/go
     curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local
     echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> $HOME/.bash_profile
-    export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
     source $HOME/.bash_profile
 
     # 安装所有二进制文件
@@ -124,7 +123,7 @@ function install_node() {
     evmosd status | jq .SyncInfo
 
 
-    echo '====================== 安装完成 ==========================='
+    echo '====================== 安装完成,退出脚本后执行 source $HOME/.bash_profile 以加载环境变量==========================='
     echo '安装完成请重新连接VPS，以启用对应快捷键功能'
     
 }
