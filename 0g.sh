@@ -115,14 +115,9 @@ function install_node() {
 
     # 使用 pm2 重启 evmosd 服务并跟踪日志
     pm2 restart evmosd
-    pm2 logs evmosd
-
-    # 检查节点的同步状态
-    evmosd status | jq .SyncInfo
 
 
-    echo '====================== 安装完成,退出脚本后执行 source $HOME/.bash_profile 以加载环境变量==========================='
-    echo '安装完成请重新连接VPS，以启用对应快捷键功能'
+    echo '====================== 安装完成,请退出脚本后执行 source $HOME/.bash_profile 以加载环境变量==========================='
     
 }
 
