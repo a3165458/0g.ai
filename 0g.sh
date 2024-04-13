@@ -290,7 +290,7 @@ screen -dmS storage_kv ../target/release/zgs_kv --config config.toml
 function delegate_self_validator() {
 read -p "请输入质押代币数量: " math
 read -p "请输入钱包名称: " wallet_name
-evmosd tx staking delegate $(evmosd keys show wallet --bech val -a)  ${math}evmos --from $wallet_name --gas=500000 --gas-prices=99999aevmos -y
+evmosd tx staking delegate $(evmosd keys show $wallet_name --bech val -a)  ${math}evmos --from $wallet_name --gas=500000 --gas-prices=99999aevmos -y
 
 }
 
