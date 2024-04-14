@@ -299,6 +299,10 @@ function check_storage_status() {
     tail -f "$(find ~/0g-storage-node/run/log/ -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d' ' -f2-)"
 }
 
+# 查看存储节点同步状态
+function start_storage() {
+cd 0g-storage-node/run && screen -dmS zgs_node_session ../target/release/zgs_node --config config.toml
+}
 
 # 主菜单
 function main_menu() {
@@ -322,7 +326,8 @@ function main_menu() {
         echo "9. 创建验证者"  
         echo "10. 创建存储节点"  
         echo "11. 查看存储节点日志"  
-        echo "12. 给自己验证者地址质押代币"
+        echo "12. 单独启动存储节点代码，适用于需要修改存储路径等功能修改过后使用"
+        echo "13. 给自己验证者地址质押代币"
         read -p "请输入选项（1-11）: " OPTION
 
         case $OPTION in
@@ -337,7 +342,9 @@ function main_menu() {
         9) add_validator ;;
         10) install_storage_node ;;
         11) check_storage_status ;;
-        12) delegate_self_validator ;;
+        12) start_storage ;;
+        13) delegate_self_validator ;;
+        
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
