@@ -304,6 +304,13 @@ function start_storage() {
 cd 0g-storage-node/run && screen -dmS zgs_node_session ../target/release/zgs_node --config config.toml
 }
 
+# 查看存储节点同步状态
+function transfer_EIP() {
+read -p "请输入你的钱包名称: " wallet_name
+echo "0x$(evmosd debug addr $(evmosd keys show $wallet_name -a) | grep hex | awk '{print $3}')"
+
+}
+
 # 主菜单
 function main_menu() {
     while true; do
@@ -328,6 +335,7 @@ function main_menu() {
         echo "11. 查看存储节点日志"  
         echo "12. 单独启动存储节点代码，适用于需要修改存储路径等功能修改过后使用"
         echo "13. 给自己验证者地址质押代币"
+        echo "14. 转换ETH地址"
         read -p "请输入选项（1-11）: " OPTION
 
         case $OPTION in
@@ -344,7 +352,7 @@ function main_menu() {
         11) check_storage_status ;;
         12) start_storage ;;
         13) delegate_self_validator ;;
-        
+        14) transfer_EIP ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
