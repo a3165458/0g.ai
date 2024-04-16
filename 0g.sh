@@ -338,7 +338,7 @@ function main_menu() {
         echo "12. 单独启动存储节点代码，适用于需要修改存储路径等功能修改过后使用"
         echo "13. 给自己验证者地址质押代币"
         echo "14. 转换ETH地址"
-        read -p "请输入选项（1-11）: " OPTION
+        read -p "请输入选项（1-14）: " OPTION
 
         case $OPTION in
         1) install_node ;;
