@@ -204,8 +204,6 @@ function install_storage_node() {
     sudo apt-get update
     sudo apt-get install clang cmake build-essential git screen cargo -y
 
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs/ | sh
-
 
 # 安装Go
     sudo rm -rf /usr/local/go
