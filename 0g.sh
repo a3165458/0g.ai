@@ -229,7 +229,7 @@ cd run
 
 read -p "请输入你想导入的EVM钱包私钥，不要有0x: " minerkey
 
-sed -i "s/miner_id = \"<hex64_without_0x_prefix>\"/miner_id = \"$(openssl rand -hex 32)\"/" config.toml
+sed -i "s/miner_id = \"\"/miner_id = \"$(openssl rand -hex 32)\"/" config.toml
 sed -i "s/miner_key = \"\"/miner_key = \"$minerkey\"/" config.toml
 
 
