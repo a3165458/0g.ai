@@ -38,6 +38,7 @@ function install_pm2() {
 
 # 节点安装功能
 function install_node() {
+    node_address="http://localhost:13457"
     install_nodejs_and_npm
     install_pm2
 
@@ -45,10 +46,6 @@ function install_node() {
     if ! command -v curl > /dev/null; then
         sudo apt update && sudo apt install curl git -y
     fi
-
-    # 设置变量
-    read -r -p "请输入你想设置的节点名称: " NODE_MONIKER
-    export NODE_MONIKER=$NODE_MONIKER
 
     # 更新和安装必要的软件
     sudo apt update && sudo apt upgrade -y
@@ -75,7 +72,7 @@ function install_node() {
     cd $HOME
     evmosd init $MONIKER --chain-id zgtendermint_9000-1
     evmosd config chain-id zgtendermint_9000-1
-    evmosd config node tcp://localhost:26657
+    evmosd config node tcp://localhost:13457
     evmosd config keyring-backend os 
 
     # 配置节点
@@ -89,6 +86,12 @@ function install_node() {
 
     # 设置gas
     sed -i "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0.00252aevmos\"/" $HOME/.evmosd/config/app.toml
+
+    # 设置用户端口
+    sed -i -e "s%^proxy_app = \"tcp://127.0.0.1:26658\"%proxy_app = \"tcp://127.0.0.1:13458\"%; s%^laddr = \"tcp://127.0.0.1:26657\"%laddr = \"tcp://127.0.0.1:13457\"%; s%^pprof_laddr = \"localhost:6060\"%pprof_laddr = \"localhost:13460\"%; s%^laddr = \"tcp://0.0.0.0:26656\"%laddr = \"tcp://0.0.0.0:13456\"%; s%^prometheus_listen_addr = \":26660\"%prometheus_listen_addr = \":13466\"%" $HOME/.evmosd/config/config.toml
+    sed -i -e "s%^address = \"tcp://localhost:1317\"%address = \"tcp://0.0.0.0:13417\"%; s%^address = \":8080\"%address = \":13480\"%; s%^address = \"localhost:9090\"%address = \"0.0.0.0:13490\"%; s%^address = \"localhost:9091\"%address = \"0.0.0.0:13491\"%; s%:8545%:13445%; s%:8546%:13446%; s%:6065%:13465%" $HOME/.evmosd/config/app.toml
+    echo "export OG_RPC_PORT=$node_address" >> $HOME/.bash_profile
+    source $HOME/.bash_profile
 
     # 使用 PM2 启动节点进程
     pm2 start evmosd -- start && pm2 save && pm2 startup
@@ -164,12 +167,12 @@ function import_wallet() {
 # 查询余额
 function check_balances() {
     read -p "请输入钱包地址: " wallet_address
-    evmosd query bank balances "$wallet_address" 
+    evmosd query bank balances "$wallet_address" --node $OG_RPC_PORT
 }
 
 # 查看节点同步状态
 function check_sync_status() {
-    evmosd status 2>&1 | jq .SyncInfo
+    evmosd status 2>&1 --node $OG_RPC_PORT | jq .SyncInfo
 }
 
 # 创建验证者
@@ -196,7 +199,7 @@ evmosd tx staking create-validator \
   --gas=500000 \
   --gas-prices=99999aevmos \
   -y
-
+  --node $OG_RPC_PORT
 }
 
 function install_storage_node() {
@@ -290,7 +293,7 @@ screen -dmS storage_kv ../target/release/zgs_kv --config config.toml
 function delegate_self_validator() {
 read -p "请输入质押代币数量: " math
 read -p "请输入钱包名称: " wallet_name
-evmosd tx staking delegate $(evmosd keys show $wallet_name --bech val -a)  ${math}evmos --from $wallet_name --gas=500000 --gas-prices=99999aevmos -y
+evmosd tx staking delegate $(evmosd keys show $wallet_name --bech val -a)  ${math}evmos --from $wallet_name --gas=500000 --gas-prices=99999aevmos -y --node $OG_RPC_PORT
 
 }
 
@@ -318,7 +321,6 @@ function main_menu() {
         echo "脚本以及教程由推特用户大赌哥 @y95277777 编写，免费开源，请勿相信收费"
         echo "================================================================"
         echo "节点社区 Telegram 群组:https://t.me/niuwuriji"
-        echo "节点社区 Telegram 频道:https://t.me/niuwuriji"
         echo "节点社区 Discord 社群:https://discord.gg/GbMV5EcNWF"
         echo "退出脚本，请按键盘ctrl c退出即可"
         echo "请选择要执行的操作:"
