@@ -52,7 +52,6 @@ function install_node() {
     sudo apt install curl git wget htop tmux build-essential jq make lz4 gcc unzip liblz4-tool -y
 
     # 安装Go
-    sudo rm -rf /usr/local/go
     curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local
     echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> $HOME/.bash_profile
     source $HOME/.bash_profile
