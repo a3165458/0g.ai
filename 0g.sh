@@ -183,7 +183,7 @@ read -p "请输入您想设置的验证者的名字: " validator_name
 read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
 
 
-evmosd tx staking create-validator \
+evmosd tx staking create-validator --node $Alignedlayer_RPC_PORT \
   --amount=10000000000000000aevmos \
   --pubkey=$(evmosd tendermint show-validator) \
   --moniker=$validator_name \
