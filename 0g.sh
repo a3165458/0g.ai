@@ -48,7 +48,7 @@ function check_go_installation() {
 
 # 节点安装功能
 function install_node() {
-    node_address="http://localhost:13457"
+    node_address="tcp://localhost:13457"
     install_nodejs_and_npm
     install_pm2
 
