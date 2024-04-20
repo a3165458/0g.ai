@@ -35,6 +35,16 @@ function install_pm2() {
     fi
 }
 
+# 检查Go环境
+function check_go_installation() {
+    if command -v go > /dev/null 2>&1; then
+        echo "Go 环境已安装"
+        return 0 
+    else
+        echo "Go 环境未安装，正在安装..."
+        return 1 
+    fi
+}
 
 # 节点安装功能
 function install_node() {
@@ -51,11 +61,14 @@ function install_node() {
     sudo apt update && sudo apt upgrade -y
     sudo apt install curl git wget htop tmux build-essential jq make lz4 gcc unzip liblz4-tool -y
 
-    # 安装Go
-    sudo rm -rf /usr/local/go
-    curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local
-    echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> $HOME/.bash_profile
-    source $HOME/.bash_profile
+    # 安装 Go
+    if ! check_go_installation; then
+        sudo rm -rf /usr/local/go
+        curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local
+        echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> $HOME/.bash_profile
+        source $HOME/.bash_profile
+        go version
+    fi
 
     # 安装所有二进制文件
     git clone https://github.com/0glabs/0g-evmos.git
