@@ -318,9 +318,11 @@ function check_storage_status() {
 # 查看存储节点同步状态
 function start_storage() {
 cd 0g-storage-node/run && screen -dmS zgs_node_session ../target/release/zgs_node --config config.toml
+echo '====================== 启动成功，请通过screen -r zgs_node_session 查询 ==========================='
+
 }
 
-# 查看存储节点同步状态
+# 转换ETH地址
 function transfer_EIP() {
 read -p "请输入你的钱包名称: " wallet_name
 echo "0x$(evmosd debug addr $(evmosd keys show $wallet_name -a) | grep hex | awk '{print $3}')"
