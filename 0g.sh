@@ -213,7 +213,6 @@ evmosd tx staking create-validator --node $Alignedlayer_RPC_PORT \
   --gas=500000 \
   --gas-prices=99999aevmos \
   -y
-  --node $OG_RPC_PORT
 }
 
 function install_storage_node() {
