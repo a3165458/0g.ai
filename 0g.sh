@@ -332,7 +332,7 @@ function main_menu() {
     while true; do
         clear
         echo "脚本以及教程由推特用户大赌哥 @y95277777 编写，免费开源，请勿相信收费"
-        echo "================================================================"
+        echo "=======================验证节点功能================================"
         echo "节点社区 Telegram 群组:https://t.me/niuwuriji"
         echo "节点社区 Discord 社群:https://discord.gg/GbMV5EcNWF"
         echo "退出脚本，请按键盘ctrl c退出即可"
@@ -346,11 +346,12 @@ function main_menu() {
         echo "7. 运行日志查询"
         echo "8. 卸载节点"
         echo "9. 创建验证者"  
-        echo "10. 创建存储节点"  
-        echo "11. 查看存储节点日志"  
-        echo "12. 单独启动存储节点代码，适用于需要修改存储路径等功能修改过后使用"
-        echo "13. 给自己验证者地址质押代币"
-        echo "14. 转换ETH地址"
+        echo "10. 给自己验证者地址质押代币"
+        echo "11. 转换ETH地址"
+        echo "=======================存储节点功能================================"
+        echo "12. 创建存储节点"  
+        echo "13. 查看存储节点日志"  
+        echo "14. 单独启动存储节点代码，适用于需要修改存储路径等功能修改过后使用"
         read -p "请输入选项（1-14）: " OPTION
 
         case $OPTION in
@@ -363,11 +364,12 @@ function main_menu() {
         7) view_logs ;;
         8) uninstall_node ;;
         9) add_validator ;;
-        10) install_storage_node ;;
-        11) check_storage_status ;;
-        12) start_storage ;;
-        13) delegate_self_validator ;;
-        14) transfer_EIP ;;
+        10) delegate_self_validator ;;
+        11) transfer_EIP ;;
+        12) install_storage_node ;;
+        13) check_storage_status ;;
+        14) start_storage ;;
+
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
