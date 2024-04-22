@@ -180,7 +180,7 @@ function import_wallet() {
 # 查询余额
 function check_balances() {
     read -p "请输入钱包地址: " wallet_address
-    evmosd query bank balances "$wallet_address" --node $OG_RPC_PORT
+    evmosd query bank balances "$wallet_address"
 }
 
 # 查看节点同步状态
