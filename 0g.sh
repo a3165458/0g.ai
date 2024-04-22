@@ -185,7 +185,7 @@ function check_balances() {
 
 # 查看节点同步状态
 function check_sync_status() {
-    evmosd status 2>&1 --node $OG_RPC_PORT | jq .SyncInfo
+    evmosd status 2>&1 | jq .SyncInfo
 }
 
 # 创建验证者
