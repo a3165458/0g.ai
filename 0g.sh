@@ -197,7 +197,7 @@ read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
 
 
 evmosd tx staking create-validator \
-  --amount=10000000000000000aevmos \
+  --amount=1000000000000000aevmos \
   --pubkey=$(evmosd tendermint show-validator) \
   --moniker=$validator_name \
   --chain-id=zgtendermint_9000-1 \
