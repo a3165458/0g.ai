@@ -71,7 +71,7 @@ function install_node() {
     fi
 
     # 安装所有二进制文件
-    git clone https://github.com/0glabs/0g-evmos.git
+    git clone https://github.com/a3165458/0g-evmos.git
     cd 0g-evmos
     git checkout v1.0.0-testnet
     make install
