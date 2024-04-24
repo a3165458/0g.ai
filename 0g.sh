@@ -89,6 +89,7 @@ function install_node() {
 
     # 配置节点
     wget https://raw.githubusercontent.com/a3165458/0g.ai/main/gensis.json -O $HOME/.evmosd/config/genesis.json
+    wget -O $HOME/.evmosd/config/addrbook.json https://raw.githubusercontent.com/a3165458/0g.ai/main/addrbook.json
 
 
     # 下载快照
