@@ -88,7 +88,7 @@ function install_node() {
     evmosd config keyring-backend os 
 
     # 配置节点
-    wget https://github.com/0glabs/0g-evmos/releases/download/v1.0.0-testnet/genesis.json -O $HOME/.evmosd/config/genesis.json
+    wget https://raw.githubusercontent.com/a3165458/0g.ai/main/gensis.json -O $HOME/.evmosd/config/genesis.json
 
 
     # 下载快照
