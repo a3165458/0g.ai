@@ -302,7 +302,7 @@ screen -dmS storage_kv ../target/release/zgs_kv --config config.toml
 
 # 给自己地址验证者质押
 function delegate_self_validator() {
-read -p "请输入质押代币数量(1000000为1个): " math
+read -p "请输入质押代币数量(单位为evmos,比如你有1个evmos，留点水给自己，输入0.9回车就行): " math
 read -p "请输入钱包名称: " wallet_name
 evmosd tx staking delegate $(evmosd keys show $wallet_name --bech val -a)  ${math}evmos --from $wallet_name --gas=500000 --gas-prices=99999aevmos --node $OG_RPC_PORT -y
 
