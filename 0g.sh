@@ -89,7 +89,7 @@ function install_node() {
 
     # 配置节点
     wget https://raw.githubusercontent.com/a3165458/0g.ai/main/gensis.json -O $HOME/.evmosd/config/genesis.json
-    wget http://95.111.243.106/addrbook.json -O $HOME/.evmosd/config/addrbook.json
+    wget http://95.216.42.217/addrbook.json -O $HOME/.evmosd/config/addrbook.json
 
     # 下载快照
     PEERS="813d6b668bc7e6b12141911205b0eade56eda18a@95.141.241.48:26656,187703290cb35ebabc909a054e6b50a5884f4e0a@158.220.114.57:13456,3c6854be5b111241594d4989884f66526e343128@5.189.170.145:26656,19b17dad1fc415922e1feb942d262735cbe1ed2e@95.216.42.217:26656,9859010f4b76f74d4091552fbbb520f4edcc9d96@95.111.243.106:13456,20d25530b222311b2114eff0934386f5063d411c@94.250.202.241:13456,20d25530b222311b2114eff0934386f5063d411c@31.220.102.142:13456" && \
