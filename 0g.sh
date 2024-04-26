@@ -324,7 +324,7 @@ echo '====================== 启动成功，请通过screen -r zgs_node_session 
 # 转换ETH地址
 function transfer_EIP() {
 read -p "请输入你的钱包名称: " wallet_name
-echo "0x$(evmosd debug addr $(evmosd keys show $wallet_name -a) | grep hex | awk '{print $3}')"
+echo "$(evmosd debug addr $(evmosd keys show $wallet_name -a) | grep hex | awk '{print $3}')"
 
 }
 
