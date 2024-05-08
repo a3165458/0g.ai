@@ -89,35 +89,13 @@ function install_node() {
     wget -O ~/.0gchain/config/genesis.json https://github.com/0glabs/0g-chain/releases/download/v0.1.0/genesis.json
     0gchaind validate-genesis
     
-    # 下载快照
-    PEERS="" && \
+    # 配置节点
     SEEDS="c4d619f6088cb0b24b4ab43a0510bf9251ab5d7f@54.241.167.190:26656,44d11d4ba92a01b520923f51632d2450984d5886@54.176.175.48:26656,f2693dd86766b5bf8fd6ab87e2e970d564d20aff@54.193.250.204:26656,f878d40c538c8c23653a5b70f615f8dccec6fb9f@54.215.187.94:26656" && \
-    sed -i -e "s/^seeds *=.*/seeds = \"$SEEDS\"/; s/^persistent_peers *=.*/persistent_peers = \"$PEERS\"/" $HOME/.0gchain/config/config.toml
+    sed -i "s/seeds = \"\"/seeds = \"$SEEDS\"/" $HOME/.0gchain/config/config.toml
+
 
     # 使用 PM2 启动节点进程
     pm2 start 0gchaind -- start && pm2 save && pm2 startup
-
-
-    # 使用 pm2 停止 ogd 服务
-    pm2 stop 0gchaind
-
-    # 下载最新的快照
-    wget -O latest_snapshot.tar.lz4 https://rpc-zero-gravity-testnet.trusted-point.com/latest_snapshot.tar.lz4
-
-    # 备份当前的验证者状态文件
-    cp $HOME/.0gchaind/data/priv_validator_state.json $HOME/.0gchaind/priv_validator_state.json.backup
-
-    # 重置数据目录同时保留地址簿
-    0gchaind tendermint unsafe-reset-all --home $HOME/.0gchaind --keep-addr-book
-
-    # 将快照解压直接到 .0gchaind 目录
-    lz4 -d -c ./latest_snapshot.tar.lz4 | tar -xf - -C $HOME/.0gchaind
-
-    # 恢复验证者状态文件的备份
-    mv $HOME/.0gchaind/priv_validator_state.json.backup $HOME/.0gchaind/data/priv_validator_state.json
-
-    # 使用 pm2 重启 0gchaind 服务并跟踪日志
-    pm2 restart 0gchaind
 
 
     echo '====================== 安装完成,请退出脚本后执行 source $HOME/.bash_profile 以加载环境变量==========================='
