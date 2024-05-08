@@ -163,10 +163,10 @@ read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
 
 
 0gchaind tx staking create-validator \
-  --amount=1000000000000000aevmos \
+  --amount=1000000000000000ua0gi \
   --pubkey=$(0gchaind tendermint show-validator) \
   --moniker=$validator_name \
-  --chain-id=zgtendermint_9000-1 \
+  --chain-id=zgtendermint_16600-1 \
   --commission-rate=0.05 \
   --commission-max-rate=0.10 \
   --commission-max-change-rate=0.01 \
@@ -175,8 +175,8 @@ read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
   --identity="" \
   --website="" \
   --details="$details" \
-  --gas=500000 \
-  --gas-prices=99999aevmos \
+  --gas=auto \
+  --gas-adjustment=1.4
   -y
 }
 
