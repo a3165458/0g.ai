@@ -290,7 +290,7 @@ echo '====================== 启动成功，请通过screen -r zgs_node_session 
 # 转换ETH地址
 function transfer_EIP() {
 read -p "请输入你的钱包名称: " wallet_name
-echo "$(0gchaind debug addr $(0gchaind keys show $wallet_name -a) | grep hex | awk '{print $3}')"
+echo "0x$(0gchaind debug addr $(0gchaind keys show $wallet_name -a) | grep hex | awk '{print $3}')"
 
 }
 
