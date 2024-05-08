@@ -99,7 +99,13 @@ function install_node() {
 
     # 使用 PM2 启动节点进程
     pm2 start 0gchaind -- start && pm2 save && pm2 startup
+    
+    pm2 stop 0gchaind
+    curl -L https://smeby.fun/0gchaind_snapshots.tar.lz4 | tar -I lz4 -xf - -C $HOME/.0gchain/data
 
+    mv $HOME/.0gchain/priv_validator_state.json.backup $HOME/.0gchain/data/priv_validator_state.json
+
+    pm2 restart 0gchaind
 
     echo '====================== 安装完成,请退出脚本后执行 source $HOME/.bash_profile 以加载环境变量==========================='
     
