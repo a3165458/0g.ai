@@ -71,10 +71,9 @@ function install_node() {
     fi
 
     # 安装所有二进制文件
-    git clone https://github.com/a3165458/0g-evmos.git
-    cd 0g-evmos
+    git clone -b v0.1.0 https://github.com/0glabs/0g-chain.git
+    cd 0g-chain
     make install
-    evmosd version
 
     # 配置evmosd
     export MONIKER="My_Node"
@@ -82,33 +81,21 @@ function install_node() {
 
     # 获取初始文件和地址簿
     cd $HOME
-    evmosd init $MONIKER --chain-id zgtendermint_9000-1
-    evmosd config chain-id zgtendermint_9000-1
-    evmosd config node tcp://localhost:13457
-    evmosd config keyring-backend os 
+    0gchaind init $MONIKER --chain-id zgtendermint_16600-1
+    0gchaind config chain-id zgtendermint_16600-1
+
 
     # 配置节点
-    wget https://raw.githubusercontent.com/a3165458/0g.ai/main/gensis.json -O $HOME/.evmosd/config/genesis.json
-    wget http://95.216.42.217/addrbook.json -O $HOME/.evmosd/config/addrbook.json
-
+    wget -O ~/.0gchain/config/genesis.json https://github.com/0glabs/0g-chain/releases/download/v0.1.0/genesis.json
+    0gchaind validate-genesis
+    
     # 下载快照
-    PEERS="813d6b668bc7e6b12141911205b0eade56eda18a@95.141.241.48:26656,187703290cb35ebabc909a054e6b50a5884f4e0a@158.220.114.57:13456,3c6854be5b111241594d4989884f66526e343128@5.189.170.145:26656,19b17dad1fc415922e1feb942d262735cbe1ed2e@95.216.42.217:26656,9859010f4b76f74d4091552fbbb520f4edcc9d96@95.111.243.106:13456,20d25530b222311b2114eff0934386f5063d411c@94.250.202.241:13456,20d25530b222311b2114eff0934386f5063d411c@31.220.102.142:13456" && \
-    SEEDS="" && \
-    sed -i -e "s/^seeds *=.*/seeds = \"$SEEDS\"/; s/^persistent_peers *=.*/persistent_peers = \"$PEERS\"/" $HOME/.evmosd/config/config.toml
-
-    # 设置gas
-    sed -i "s/^minimum-gas-prices *=.*/minimum-gas-prices = \"0.00252aevmos\"/" $HOME/.evmosd/config/app.toml
-
-    # 设置用户端口
-    node_address="tcp://localhost:13457"
-    sed -i -e "s%^proxy_app = \"tcp://127.0.0.1:26658\"%proxy_app = \"tcp://127.0.0.1:13458\"%; s%^laddr = \"tcp://127.0.0.1:26657\"%laddr = \"tcp://127.0.0.1:13457\"%; s%^pprof_laddr = \"localhost:6060\"%pprof_laddr = \"localhost:13460\"%; s%^laddr = \"tcp://0.0.0.0:26656\"%laddr = \"tcp://0.0.0.0:13456\"%; s%^prometheus_listen_addr = \":26660\"%prometheus_listen_addr = \":13466\"%" $HOME/.evmosd/config/config.toml
-    sed -i -e "s%^address = \"tcp://localhost:1317\"%address = \"tcp://0.0.0.0:13417\"%; s%^address = \":8080\"%address = \":13480\"%; s%^address = \"localhost:9090\"%address = \"0.0.0.0:13490\"%; s%^address = \"localhost:9091\"%address = \"0.0.0.0:13491\"%; s%:8545%:13445%; s%:8546%:13446%; s%:6065%:13465%" $HOME/.evmosd/config/app.toml
-    echo "export OG_RPC_PORT=$node_address" >> $HOME/.bash_profile
-    source $HOME/.bash_profile
+    PEERS="" && \
+    SEEDS="c4d619f6088cb0b24b4ab43a0510bf9251ab5d7f@54.241.167.190:26656,44d11d4ba92a01b520923f51632d2450984d5886@54.176.175.48:26656,f2693dd86766b5bf8fd6ab87e2e970d564d20aff@54.193.250.204:26656,f878d40c538c8c23653a5b70f615f8dccec6fb9f@54.215.187.94:26656" && \
+    sed -i -e "s/^seeds *=.*/seeds = \"$SEEDS\"/; s/^persistent_peers *=.*/persistent_peers = \"$PEERS\"/" $HOME/.0gchain/config/config.toml
 
     # 使用 PM2 启动节点进程
-    pm2 start evmosd -- start && pm2 save && pm2 startup
-
+    pm2 start 0gchaind -- start && pm2 save && pm2 startup
 
 
     # 使用 pm2 停止 ogd 服务
@@ -149,14 +136,14 @@ function view_logs() {
 
 # 卸载节点功能
 function uninstall_node() {
-    echo "你确定要卸载0g ai 节点程序吗？这将会删除所有相关的数据。[Y/N]"
+    echo "你确定要卸载0gchain 节点程序吗？这将会删除所有相关的数据。[Y/N]"
     read -r -p "请确认: " response
 
     case "$response" in
         [yY][eE][sS]|[yY]) 
             echo "开始卸载节点程序..."
-            pm2 stop evmosd && pm2 delete evmosd
-            rm -rf $HOME/.evmosd $HOME/evmos $(which evmosd) && rm -rf 0g-evmos
+            pm2 stop 0gchaind && pm2 delete 0gchaind
+            rm -rf $HOME/.0gchain $HOME/0gchain $(which 0gchaind) && rm -rf 0g-chain
             echo "节点程序卸载完成。"
             ;;
         *)
