@@ -294,6 +294,25 @@ echo "0x$(0gchaind debug addr $(0gchaind keys show $wallet_name -a) | grep hex |
 
 }
 
+# 卸载节点功能
+function uninstall_old_node() {
+    echo "你确定要卸载0g ai 节点程序吗？这将会删除所有相关的数据。[Y/N]"
+    read -r -p "请确认: " response
+
+    case "$response" in
+        [yY][eE][sS]|[yY]) 
+            echo "开始卸载节点程序..."
+            pm2 stop evmosd && pm2 delete evmosd
+            rm -rf $HOME/.evmosd $HOME/evmos $(which evmosd) && rm -rf 0g-evmos
+            echo "节点程序卸载完成。"
+            ;;
+        *)
+            echo "取消卸载操作。"
+            ;;
+    esac
+}
+
+
 # 主菜单
 function main_menu() {
     while true; do
@@ -319,7 +338,9 @@ function main_menu() {
         echo "12. 创建存储节点"  
         echo "13. 查看存储节点日志"  
         echo "14. 单独启动存储节点代码，适用于需要修改存储路径等功能修改过后使用"
-        read -p "请输入选项（1-14）: " OPTION
+        echo "=======================卸载evmos测试网节点功能================================"
+        echo "15. 卸载evmos验证者节点"  
+        read -p "请输入选项（1-15）: " OPTION
 
         case $OPTION in
         1) install_node ;;
@@ -336,6 +357,7 @@ function main_menu() {
         12) install_storage_node ;;
         13) check_storage_status ;;
         14) start_storage ;;
+        15) uninstall_old_node ;;
 
         *) echo "无效选项。" ;;
         esac
