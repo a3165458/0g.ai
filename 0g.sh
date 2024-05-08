@@ -146,12 +146,12 @@ function import_wallet() {
 # 查询余额
 function check_balances() {
     read -p "请输入钱包地址: " wallet_address
-    0gchaind query bank balances "$wallet_address"  --node $OG_RPC_PORT
+    0gchaind query bank balances "$wallet_address"
 }
 
 # 查看节点同步状态
 function check_sync_status() {
-    0gchaind status 2>&1 --node $OG_RPC_PORT  | jq .sync_info
+    0gchaind status 2>&1 | jq .sync_info
 }
 
 # 创建验证者
@@ -271,7 +271,7 @@ screen -dmS storage_kv ../target/release/zgs_kv --config config.toml
 function delegate_self_validator() {
 read -p "请输入质押代币数量(单位为evmos,比如你有1个evmos，留点水给自己，输入0.9回车就行): " math
 read -p "请输入钱包名称: " wallet_name
-0gchaind tx staking delegate $(0gchaind keys show $wallet_name --bech val -a)  ${math}evmos --from $wallet_name --gas=500000 --gas-prices=99999aevmos --node $OG_RPC_PORT -y
+0gchaind tx staking delegate $(0gchaind keys show $wallet_name --bech val -a)  ${math}evmos --from $wallet_name --gas=500000 --gas-prices=99999aevmos -y
 
 }
 
