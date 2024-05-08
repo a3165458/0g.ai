@@ -75,7 +75,7 @@ function install_node() {
     cd 0g-chain
     make install
 
-    # 配置evmosd
+    # 配置0gchaind
     export MONIKER="My_Node"
     export WALLET_NAME="wallet"
 
@@ -99,25 +99,25 @@ function install_node() {
 
 
     # 使用 pm2 停止 ogd 服务
-    pm2 stop evmosd
+    pm2 stop 0gchaind
 
     # 下载最新的快照
     wget -O latest_snapshot.tar.lz4 https://rpc-zero-gravity-testnet.trusted-point.com/latest_snapshot.tar.lz4
 
     # 备份当前的验证者状态文件
-    cp $HOME/.evmosd/data/priv_validator_state.json $HOME/.evmosd/priv_validator_state.json.backup
+    cp $HOME/.0gchaind/data/priv_validator_state.json $HOME/.0gchaind/priv_validator_state.json.backup
 
     # 重置数据目录同时保留地址簿
-    evmosd tendermint unsafe-reset-all --home $HOME/.evmosd --keep-addr-book
+    0gchaind tendermint unsafe-reset-all --home $HOME/.0gchaind --keep-addr-book
 
-    # 将快照解压直接到 .evmosd 目录
-    lz4 -d -c ./latest_snapshot.tar.lz4 | tar -xf - -C $HOME/.evmosd
+    # 将快照解压直接到 .0gchaind 目录
+    lz4 -d -c ./latest_snapshot.tar.lz4 | tar -xf - -C $HOME/.0gchaind
 
     # 恢复验证者状态文件的备份
-    mv $HOME/.evmosd/priv_validator_state.json.backup $HOME/.evmosd/data/priv_validator_state.json
+    mv $HOME/.0gchaind/priv_validator_state.json.backup $HOME/.0gchaind/data/priv_validator_state.json
 
-    # 使用 pm2 重启 evmosd 服务并跟踪日志
-    pm2 restart evmosd
+    # 使用 pm2 重启 0gchaind 服务并跟踪日志
+    pm2 restart 0gchaind
 
 
     echo '====================== 安装完成,请退出脚本后执行 source $HOME/.bash_profile 以加载环境变量==========================='
@@ -131,7 +131,7 @@ function check_service_status() {
 
 # 0gai 节点日志查询
 function view_logs() {
-    pm2 logs evmosd
+    pm2 logs 0gchaind
 }
 
 # 卸载节点功能
@@ -155,24 +155,24 @@ function uninstall_node() {
 # 创建钱包
 function add_wallet() {
     read -p "请输入你想设置的钱包名称: " wallet_name
-    evmosd keys add $wallet_name
+    0gchaind keys add $wallet_name
 }
 
 # 导入钱包
 function import_wallet() {
     read -p "请输入你想设置的钱包名称: " wallet_name
-    evmosd keys add $wallet_name --recover
+    0gchaind keys add $wallet_name --recover
 }
 
 # 查询余额
 function check_balances() {
     read -p "请输入钱包地址: " wallet_address
-    evmosd query bank balances "$wallet_address"  --node $OG_RPC_PORT
+    0gchaind query bank balances "$wallet_address"  --node $OG_RPC_PORT
 }
 
 # 查看节点同步状态
 function check_sync_status() {
-    evmosd status 2>&1 --node $OG_RPC_PORT  | jq .SyncInfo
+    0gchaind status 2>&1 --node $OG_RPC_PORT  | jq .SyncInfo
 }
 
 # 创建验证者
@@ -183,9 +183,9 @@ read -p "请输入您想设置的验证者的名字: " validator_name
 read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
 
 
-evmosd tx staking create-validator \
+0gchaind tx staking create-validator \
   --amount=1000000000000000aevmos \
-  --pubkey=$(evmosd tendermint show-validator) \
+  --pubkey=$(0gchaind tendermint show-validator) \
   --moniker=$validator_name \
   --chain-id=zgtendermint_9000-1 \
   --commission-rate=0.05 \
@@ -292,7 +292,7 @@ screen -dmS storage_kv ../target/release/zgs_kv --config config.toml
 function delegate_self_validator() {
 read -p "请输入质押代币数量(单位为evmos,比如你有1个evmos，留点水给自己，输入0.9回车就行): " math
 read -p "请输入钱包名称: " wallet_name
-evmosd tx staking delegate $(evmosd keys show $wallet_name --bech val -a)  ${math}evmos --from $wallet_name --gas=500000 --gas-prices=99999aevmos --node $OG_RPC_PORT -y
+0gchaind tx staking delegate $(0gchaind keys show $wallet_name --bech val -a)  ${math}evmos --from $wallet_name --gas=500000 --gas-prices=99999aevmos --node $OG_RPC_PORT -y
 
 }
 
@@ -311,7 +311,7 @@ echo '====================== 启动成功，请通过screen -r zgs_node_session 
 # 转换ETH地址
 function transfer_EIP() {
 read -p "请输入你的钱包名称: " wallet_name
-echo "$(evmosd debug addr $(evmosd keys show $wallet_name -a) | grep hex | awk '{print $3}')"
+echo "$(0gchaind debug addr $(0gchaind keys show $wallet_name -a) | grep hex | awk '{print $3}')"
 
 }
 
