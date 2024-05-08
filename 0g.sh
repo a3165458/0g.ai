@@ -143,7 +143,7 @@ function uninstall_node() {
 # 创建钱包
 function add_wallet() {
     read -p "请输入你想设置的钱包名称: " wallet_name
-    0gchaind keys add $wallet_name
+    0gchaind keys add $wallet_name --eth
 }
 
 # 导入钱包
