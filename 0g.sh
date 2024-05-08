@@ -163,7 +163,7 @@ read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
 
 
 0gchaind tx staking create-validator \
-  --amount=1000000000000000ua0gi \
+  --amount=10000000ua0gi \
   --pubkey=$(0gchaind tendermint show-validator) \
   --moniker=$validator_name \
   --chain-id=zgtendermint_16600-1 \
