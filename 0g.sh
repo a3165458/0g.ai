@@ -149,7 +149,7 @@ function add_wallet() {
 # 导入钱包
 function import_wallet() {
     read -p "请输入你想设置的钱包名称: " wallet_name
-    0gchaind keys add $wallet_name --recover
+    0gchaind keys add $wallet_name --recover --eth
 }
 
 # 查询余额
