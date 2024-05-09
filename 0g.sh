@@ -186,7 +186,6 @@ read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
   --details="$details" \
   --gas=auto \
   --gas-adjustment=1.4
-  -y
 }
 
 function install_storage_node() {
