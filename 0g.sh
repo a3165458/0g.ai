@@ -349,7 +349,6 @@ function main_menu() {
         echo "5. 查看节点同步状态"
         echo "6. 查看当前服务状态"
         echo "7. 运行日志查询"
-        echo "8. 卸载节点"
         echo "9. 创建验证者"  
         echo "10. 给自己验证者地址质押代币"
         echo "11. 转换ETH地址"
@@ -358,7 +357,10 @@ function main_menu() {
         echo "13. 查看存储节点日志"  
         echo "14. 单独启动存储节点代码，适用于需要修改存储路径等功能修改过后使用"
         echo "=======================卸载evmos测试网节点功能================================"
-        echo "15. 卸载evmos验证者节点"  
+        echo "8. 卸载0gchain验证者节点"
+        echo "15. 卸载旧evmos验证者节点"  
+        echo "=======================备份功能================================"
+        echo "16. 备份验证者私钥"  
         read -p "请输入选项（1-15）: " OPTION
 
         case $OPTION in
@@ -377,6 +379,7 @@ function main_menu() {
         13) check_storage_status ;;
         14) start_storage ;;
         15) uninstall_old_node ;;
+        16) export_priv_validator_key ;;
 
         *) echo "无效选项。" ;;
         esac
