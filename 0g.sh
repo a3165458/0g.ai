@@ -315,8 +315,8 @@ function uninstall_old_node() {
     case "$response" in
         [yY][eE][sS]|[yY]) 
             echo "开始卸载节点程序..."
-            pm2 stop evmosd && pm2 delete evmosd
-            rm -rf $HOME/.evmosd $HOME/evmos $(which evmosd) && rm -rf 0g-evmos
+            pm2 stop 0gchaind && pm2 delete 0gchaind
+            rm -rf $HOME/.0gchain $HOME/0gchain $(which 0gchaind) && rm -rf 0gchaind
             echo "节点程序卸载完成。"
             ;;
         *)
@@ -325,6 +325,12 @@ function uninstall_old_node() {
     esac
 }
 
+# 导出验证者key
+function export_priv_validator_key() {
+    echo "====================请将下方所有内容备份到自己的记事本或者excel表格中记录==========================================="
+    cat ~/.0gchaind/config/priv_validator_key.json
+    
+}
 
 # 主菜单
 function main_menu() {
