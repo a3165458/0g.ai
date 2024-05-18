@@ -107,10 +107,9 @@ function install_node() {
     pm2 start 0gchaind -- start && pm2 save && pm2 startup
     
     pm2 stop 0gchaind
-    SNAP_NAME=$(curl -s https://testnet.anatolianteam.com/0g/ | egrep -o ">zgtendermint_16600-1.*\.tar.lz4" | tr -d ">")
-    curl -L https://testnet.anatolianteam.com/0g/${SNAP_NAME} | tar -I lz4 -xf - -C $HOME/.0gchain
-    mv $HOME/.0gchain/priv_validator_state.json.backup $HOME/.0gchain/data/priv_validator_state.json 
-
+    0gchaind tendermint unsafe-reset-all --home $HOME/.0gchain --keep-addr-book
+    curl https://snapshots-testnet.nodejumper.io/0g-testnet/0g-testnet_latest.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.0gchain
+    mv $HOME/.0gchain/priv_validator_state.json.backup $HOME/.0gchain/data/priv_validator_state.json
     pm2 restart 0gchaind
 
     echo '====================== 安装完成,请退出脚本后执行 source $HOME/.bash_profile 以加载环境变量==========================='
