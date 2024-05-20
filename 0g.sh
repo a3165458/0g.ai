@@ -83,7 +83,7 @@ function install_node() {
     cd $HOME
     0gchaind init $MONIKER --chain-id zgtendermint_16600-1
     0gchaind config chain-id zgtendermint_16600-1
-    0gchaind config node tcp://localhost:26657
+    0gchaind config node tcp://localhost:13457
 
 
     # 配置节点
