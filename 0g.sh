@@ -223,7 +223,8 @@ cd run
 read -p "请输入你想导入的EVM钱包私钥，不要有0x: " minerkey
 
 sed -i "s/miner_key = \"\"/miner_key = \"$minerkey\"/" config.toml
-sed -i 's|blockchain_rpc_endpoint = "https://rpc-testnet.0g.ai"|blockchain_rpc_endpoint = "https://0g-evm-rpc.stakeme.pro"|g' config.toml
+sed -i 's|blockchain_rpc_endpoint = "https://rpc-testnet.0g.ai"|blockchain_rpc_endpoint = "https://evm-rpc-0gchain.dadunode.com"|g' config.toml
+sed -i 's/log_sync_start_block_number = 80981/log_sync_start_block_number = 223989/' config.toml
 
 
 screen -dmS zgs_node_session ../target/release/zgs_node --config config.toml
