@@ -335,6 +335,7 @@ function main_menu() {
     while true; do
         clear
         echo "脚本以及教程由推特用户大赌哥 @y95277777 编写，免费开源，请勿相信收费"
+        echo "=======================0GAI节点安装================================"
         echo "=======================验证节点功能================================"
         echo "节点社区 Telegram 群组:https://t.me/niuwuriji"
         echo "节点社区 Discord 社群:https://discord.gg/GbMV5EcNWF"
