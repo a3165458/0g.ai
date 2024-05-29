@@ -327,6 +327,24 @@ function export_priv_validator_key() {
     
 }
 
+function uninstall_storage_node() {
+    echo "你确定要卸载0g ai 存储节点程序吗？这将会删除所有相关的数据。[Y/N]"
+    read -r -p "请确认: " response
+
+    case "$response" in
+        [yY][eE][sS]|[yY]) 
+            echo "开始卸载节点程序..."
+            rm -rf $HOME/0g-storage-node
+            echo "节点程序卸载完成。"
+            ;;
+        *)
+            echo "取消卸载操作。"
+            ;;
+    esac
+}
+
+
+
 # 主菜单
 function main_menu() {
     while true; do
@@ -352,6 +370,7 @@ function main_menu() {
         echo "12. 创建存储节点"  
         echo "13. 查看存储节点日志"  
         echo "14. 单独启动存储节点代码，适用于需要修改存储路径等功能修改过后使用"
+        echo "17. 单独启动存储节点代码，适用于需要修改存储路径等功能修改过后使用"
         echo "=======================卸载evmos测试网节点功能================================"
         echo "8. 卸载0gchain验证者节点"
         echo "15. 卸载旧evmos验证者节点"  
@@ -376,6 +395,7 @@ function main_menu() {
         14) start_storage ;;
         15) uninstall_old_node ;;
         16) export_priv_validator_key ;;
+        17) uninstall_storage_node ;;
 
         *) echo "无效选项。" ;;
         esac
