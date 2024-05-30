@@ -323,7 +323,7 @@ function uninstall_old_node() {
 # 导出验证者key
 function export_priv_validator_key() {
     echo "====================请将下方所有内容备份到自己的记事本或者excel表格中记录==========================================="
-    cat ~/.0gchaind/config/priv_validator_key.json
+    cat ~/.0gchain/config/priv_validator_key.json
     
 }
 
