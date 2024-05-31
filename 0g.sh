@@ -343,7 +343,12 @@ function uninstall_storage_node() {
     esac
 }
 
-
+function update_script() {
+    SCRIPT_URL="https://raw.githubusercontent.com/a3165458/0g.ai/main/0g.sh"
+    curl -o $SCRIPT_PATH $SCRIPT_URL
+    chmod +x $SCRIPT_PATH
+    echo "脚本已更新。请退出脚本后，执行bash 0g.sh 重新运行此脚本。"
+}
 
 # 主菜单
 function main_menu() {
@@ -376,7 +381,9 @@ function main_menu() {
         echo "15. 卸载旧evmos验证者节点"  
         echo "=======================备份功能================================"
         echo "16. 备份验证者私钥"  
-        read -p "请输入选项（1-15）: " OPTION
+        echo "======================================================="
+        echo "18. 更新本脚本"  
+        read -p "请输入选项（1-18）: " OPTION
 
         case $OPTION in
         1) install_node ;;
@@ -396,7 +403,7 @@ function main_menu() {
         15) uninstall_old_node ;;
         16) export_priv_validator_key ;;
         17) uninstall_storage_node ;;
-
+        18) update_script ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
