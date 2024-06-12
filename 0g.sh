@@ -207,7 +207,7 @@ function install_storage_node() {
 
     
 # 克隆仓库
-git clone -b v0.2.0 https://github.com/0glabs/0g-storage-node.git
+git clone -b v0.3.0 https://github.com/0glabs/0g-storage-node.git
 
 #进入对应目录构建
 cd 0g-storage-node
@@ -226,8 +226,8 @@ sed -i "s/miner_key = \"\"/miner_key = \"$minerkey\"/" config.toml
 
 screen -dmS zgs_node_session ../target/release/zgs_node --config config.toml
 
-echo '====================== 安装完成 ==========================='
-echo '===进入对应路径:/0g-storage-node/run/log，使用tail -f logs文件名，查看logs 即可========================'
+echo '====================== 安装完成，使用screen命令查询即可 ==========================='
+
 
 }
 
