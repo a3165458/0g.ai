@@ -83,6 +83,7 @@ function install_node() {
     cd $HOME
     0gchaind init $MONIKER --chain-id zgtendermint_16600-1
     0gchaind config chain-id zgtendermint_16600-1
+    0gchaind config node tcp://localhost:13457
 
     # 配置节点
     rm ~/.0gchain/config/genesis.json
@@ -165,7 +166,7 @@ function check_balances() {
 
 # 查看节点同步状态
 function check_sync_status() {
-    0gchaind status --node $OG_RPC_PORT | jq .sync_info
+    0gchaind status | jq .sync_info
 }
 
 # 创建验证者
@@ -176,7 +177,7 @@ read -p "请输入您想设置的验证者的名字: " validator_name
 read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
 
 
-0gchaind tx staking create-validator --node $OG_RPC_PORT \
+0gchaind tx staking create-validator \
   --amount=1000000ua0gi \
   --pubkey=$(0gchaind tendermint show-validator) \
   --moniker=$validator_name \
@@ -280,7 +281,7 @@ screen -dmS storage_kv ../target/release/zgs_kv --config config.toml
 function delegate_self_validator() {
 read -p "请输入质押代币数量(单位为ua0gai,比如你有1000000个ua0gai，留点水给自己，输入900000回车就行): " math
 read -p "请输入钱包名称: " wallet_name
-0gchaind tx staking delegate $(0gchaind keys show $wallet_name --bech val -a) --node $OG_RPC_PORT ${math}ua0gi --from $wallet_name   --gas=auto --gas-adjustment=1.4 -y
+0gchaind tx staking delegate $(0gchaind keys show $wallet_name --bech val -a) ${math}ua0gi --from $wallet_name   --gas=auto --gas-adjustment=1.4 -y
 
 }
 
