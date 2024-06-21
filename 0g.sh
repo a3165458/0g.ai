@@ -72,8 +72,8 @@ function install_node() {
 
     # 安装所有二进制文件
     git clone -b v0.2.3 https://github.com/0glabs/0g-chain.git
-    cd 0g-chain
-    make install
+    ./0g-chain/networks/testnet/install.sh
+    source ~/.profile
 
     # 配置0gchaind
     export MONIKER="My_Node"
@@ -87,13 +87,13 @@ function install_node() {
 
 
     # 配置节点
-    wget -O ~/.0gchain/config/genesis.json https://github.com/0glabs/0g-chain/releases/download/v0.2.3/genesis.json
+    rm ~/.0gchain/config/genesis.json
+    wget -P ~/.0gchain/config https://github.com/0glabs/0g-chain/releases/download/v0.2.3/genesis.json
     0gchaind validate-genesis
-    wget https://snapshots.dadunode.com/0gchain/addrbook.json -O $HOME/.0gchain/config/addrbook.json
     
     # 配置节点
-    SEEDS="c4d619f6088cb0b24b4ab43a0510bf9251ab5d7f@54.241.167.190:26656,44d11d4ba92a01b520923f51632d2450984d5886@54.176.175.48:26656,f2693dd86766b5bf8fd6ab87e2e970d564d20aff@54.193.250.204:26656,f878d40c538c8c23653a5b70f615f8dccec6fb9f@54.215.187.94:26656"
-    PEERS="1b1d5996e51091b498e635d4ee772d3951e54d47@62.171.142.222:12656,3b0fd60499e74b773b85f4741d6b934f5e226912@158.220.109.208:12656,3cbb3424411d1131a40dd867ef01fd3fc505bed0@77.237.238.41:33556,3f48c6c41ef9a5e261a0ca7ccd73ff481972b902@161.97.142.16:13456,adb020421007751d1fa3fe779796460e3889839e@161.97.94.69:12656,2d1f251c61b707e2c3521b1f5d8d431765366bfd@193.233.164.82:26656,e0f225fb7356ab47328277f0a3df0e81e9ba67e3@65.109.35.243:26656,bccca94165140b3507bcee0982508c819671b1db@95.217.113.104:56656,8956c62a1e02a7798da2007c408fe011fbb6ab28@65.21.69.53:14256,d1f036c8cabf9c51d85e4f03f4e313ca6b39cf27@207.180.254.230:12656,acff2b2b3c01d4903cdfd61cc9d2d0c4383f4dc4@65.108.245.136:26656,dcab92e44650591346a4b0e05c40349846cadf26@207.244.243.144:26656,892d98c9400c0f913fe689274b56827660fe2e58@157.173.200.31:13456,249328bbee0543929f26f18cfbddec6d0077c19a@161.97.96.184:12656,4a0010b186d3abc0aad75bb2e1f6743d6684b996@116.202.196.217:12656"
+    SEEDS="265120a9bb170cf21198aabf88f7908c9944897c@54.241.167.190:26656,497f865d8a0f6c830e2b73009a01b3edefb22577@54.176.175.48:26656,ffc49903241a4e442465ec78b8f421c56b3ae3d4@54.193.250.204:26656,f37bc8623bfa4d8e519207b965a24a288f3213d8@18.166.164.232:26656"
+    PEERS=""
     sed -i "s/persistent_peers = \"\"/persistent_peers = \"$PEERS\"/" $HOME/.0gchain/config/config.toml
     sed -i "s/seeds = \"\"/seeds = \"$SEEDS\"/" $HOME/.0gchain/config/config.toml
 
@@ -103,6 +103,7 @@ function install_node() {
     sed -i -e "s%^address = \"tcp://localhost:1317\"%address = \"tcp://0.0.0.0:13417\"%; s%^address = \":8080\"%address = \":13480\"%; s%^address = \"0.0.0.0:9090\"%address = \"0.0.0.0:13490\"%; s%^address = \"localhost:9091\"%address = \"0.0.0.0:13491\"%; s%:8545%:13445%; s%:8546%:13446%; s%:6065%:13465%" $HOME/.0gchain/config/app.toml
     echo "export OG_RPC_PORT=$node_address" >> $HOME/.bash_profile
     source $HOME/.bash_profile
+    
     # 使用 PM2 启动节点进程
     pm2 start 0gchaind -- start && pm2 save && pm2 startup
 
