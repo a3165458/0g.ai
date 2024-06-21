@@ -71,7 +71,7 @@ function install_node() {
     fi
 
     # 安装所有二进制文件
-    git clone -b v0.1.0 https://github.com/0glabs/0g-chain.git
+    git clone -b v0.2.3 https://github.com/0glabs/0g-chain.git
     cd 0g-chain
     make install
 
@@ -87,7 +87,7 @@ function install_node() {
 
 
     # 配置节点
-    wget -O ~/.0gchain/config/genesis.json https://github.com/0glabs/0g-chain/releases/download/v0.1.0/genesis.json
+    wget -O ~/.0gchain/config/genesis.json https://github.com/0glabs/0g-chain/releases/download/v0.2.3/genesis.json
     0gchaind validate-genesis
     wget https://snapshots.dadunode.com/0gchain/addrbook.json -O $HOME/.0gchain/config/addrbook.json
     
@@ -105,12 +105,6 @@ function install_node() {
     source $HOME/.bash_profile
     # 使用 PM2 启动节点进程
     pm2 start 0gchaind -- start && pm2 save && pm2 startup
-    
-    pm2 stop 0gchaind
-    0gchaind tendermint unsafe-reset-all --home $HOME/.0gchain --keep-addr-book
-    curl https://snapshots-testnet.nodejumper.io/0g-testnet/0g-testnet_latest.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.0gchain
-    mv $HOME/.0gchain/priv_validator_state.json.backup $HOME/.0gchain/data/priv_validator_state.json
-    pm2 restart 0gchaind
 
     echo '====================== 安装完成,请退出脚本后执行 source $HOME/.bash_profile 以加载环境变量==========================='
     
