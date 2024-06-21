@@ -114,6 +114,9 @@ function install_node() {
     # 使用 PM2 启动节点进程
     pm2 start 0gchaind -- start && pm2 save && pm2 startup
 
+    curl -L https://snapshots.dadunode.com/0gchain/0gchaind_latest_tar.lz4 | tar -I lz4 -xf - -C $HOME/.0gchain/data
+    pm2 restart 0gchaind
+
     echo '====================== 安装完成,请退出脚本后执行 source $HOME/.bash_profile 以加载环境变量==========================='
     
 }
