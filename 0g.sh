@@ -83,8 +83,6 @@ function install_node() {
     cd $HOME
     0gchaind init $MONIKER --chain-id zgtendermint_16600-1
     0gchaind config chain-id zgtendermint_16600-1
-    0gchaind config node tcp://localhost:13457
-
 
     # 配置节点
     rm ~/.0gchain/config/genesis.json
@@ -96,6 +94,14 @@ function install_node() {
     PEERS=""
     sed -i "s/persistent_peers = \"\"/persistent_peers = \"$PEERS\"/" $HOME/.0gchain/config/config.toml
     sed -i "s/seeds = \"\"/seeds = \"$SEEDS\"/" $HOME/.0gchain/config/config.toml
+
+    # 配置裁剪
+    sed -i -e "s/^pruning *=.*/pruning = \"custom\"/" $HOME/.artelad/config/app.toml
+    sed -i -e "s/^pruning-keep-recent *=.*/pruning-keep-recent = \"100\"/" $HOME/.0gchain/config/app.toml
+    sed -i -e "s/^pruning-keep-every *=.*/pruning-keep-every = \"0\"/" $HOME/.0gchain/config/app.toml
+    sed -i -e "s/^pruning-interval *=.*/pruning-interval = \"10\"/" $HOME/.0gchain/config/app.toml
+    sed -i -e "s/^indexer *=.*/indexer = \"null\"/" $HOME/.0gchain/config/config.toml
+    sed -i -e 's/max_num_inbound_peers = 40/max_num_inbound_peers = 100/' -e 's/max_num_outbound_peers = 10/max_num_outbound_peers = 100/' $HOME/.0gchain/config/config.toml
 
     # 配置端口
     node_address="tcp://localhost:13457"
