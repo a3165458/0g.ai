@@ -210,7 +210,7 @@ function install_storage_node() {
 
     
 # 克隆仓库
-git clone -b v0.3.0 https://github.com/0glabs/0g-storage-node.git
+git clone -b v0.3.1 https://github.com/0glabs/0g-storage-node.git
 
 #进入对应目录构建
 cd 0g-storage-node
@@ -226,6 +226,7 @@ cd run
 read -p "请输入你想导入的EVM钱包私钥，不要有0x: " minerkey
 
 sed -i "s/miner_key = \"\"/miner_key = \"$minerkey\"/" config.toml
+sed -i 's/log_sync_start_block_number = [0-9]*/log_sync_start_block_number = 0/' config.toml
 
 screen -dmS zgs_node_session ../target/release/zgs_node --config config.toml
 
