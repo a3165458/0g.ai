@@ -181,7 +181,7 @@ read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
   --amount=1000000ua0gi \
   --pubkey=$(0gchaind tendermint show-validator) \
   --moniker=$validator_name \
-  --chain-id=zgtendermint_16600-1 \
+  --chain-id=zgtendermint_16600-2 \
   --commission-rate=0.05 \
   --commission-max-rate=0.10 \
   --commission-max-change-rate=0.01 \
