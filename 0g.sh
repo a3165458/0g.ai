@@ -81,8 +81,8 @@ function install_node() {
 
     # 获取初始文件和地址簿
     cd $HOME
-    0gchaind init $MONIKER --chain-id zgtendermint_16600-1
-    0gchaind config chain-id zgtendermint_16600-1
+    0gchaind init $MONIKER --chain-id zgtendermint_16600-2
+    0gchaind config chain-id zgtendermint_16600-2
     0gchaind config node tcp://localhost:13457
 
     # 配置节点
@@ -91,8 +91,8 @@ function install_node() {
     0gchaind validate-genesis
     
     # 配置节点
-    SEEDS="265120a9bb170cf21198aabf88f7908c9944897c@54.241.167.190:26656,497f865d8a0f6c830e2b73009a01b3edefb22577@54.176.175.48:26656,ffc49903241a4e442465ec78b8f421c56b3ae3d4@54.193.250.204:26656,f37bc8623bfa4d8e519207b965a24a288f3213d8@18.166.164.232:26656"
-    PEERS=""
+    SEEDS=""
+    PEERS="81987895a11f6689ada254c6b57932ab7ed909b6@54.241.167.190:26656,010fb4de28667725a4fef26cdc7f9452cc34b16d@54.176.175.48:26656,e9b4bc203197b62cc7e6a80a64742e752f4210d5@54.193.250.204:26656,68b9145889e7576b652ca68d985826abd46ad660@18.166.164.232:26656"
     sed -i "s/persistent_peers = \"\"/persistent_peers = \"$PEERS\"/" $HOME/.0gchain/config/config.toml
     sed -i "s/seeds = \"\"/seeds = \"$SEEDS\"/" $HOME/.0gchain/config/config.toml
 
@@ -101,7 +101,6 @@ function install_node() {
     sed -i -e "s/^pruning-keep-recent *=.*/pruning-keep-recent = \"100\"/" $HOME/.0gchain/config/app.toml
     sed -i -e "s/^pruning-keep-every *=.*/pruning-keep-every = \"0\"/" $HOME/.0gchain/config/app.toml
     sed -i -e "s/^pruning-interval *=.*/pruning-interval = \"10\"/" $HOME/.0gchain/config/app.toml
-    sed -i -e "s/^indexer *=.*/indexer = \"null\"/" $HOME/.0gchain/config/config.toml
     sed -i -e 's/max_num_inbound_peers = 40/max_num_inbound_peers = 100/' -e 's/max_num_outbound_peers = 10/max_num_outbound_peers = 100/' $HOME/.0gchain/config/config.toml
 
     # 配置端口
@@ -112,7 +111,6 @@ function install_node() {
     # 使用 PM2 启动节点进程
     pm2 start 0gchaind -- start && pm2 save && pm2 startup
 
-    curl -L https://snapshots.dadunode.com/0gchain/0gchaind_latest_tar.lz4 | tar -I lz4 -xf - -C $HOME/.0gchain/data
     pm2 restart 0gchaind
 
     echo '====================== 安装完成,请退出脚本后执行 source $HOME/.bash_profile 以加载环境变量==========================='
