@@ -228,7 +228,7 @@ read -p "请输入设备IP地址: " new_address
 sed -i "s/miner_key = \"\"/miner_key = \"$minerkey\"/" config.toml
 sed -i "s/log_contract_address = \"\"/log_contract_address = \"0x8873cc79c5b3b5666535C825205C9a128B1D75F1\"/" config.toml
 sed -i "s/mine_contract_address = \"\"/mine_contract_address = \"0x85F6722319538A805ED5733c5F4882d96F1C7384\"/" config.toml
-sed -i "s|^# *network_enr_address = \".*\"|network_enr_address = \"$new_address\"|" config_file.toml
+sed -i "s|^# *network_enr_address = \".*\"|network_enr_address = \"$new_address\"|" config.toml
 sed -i 's/log_sync_start_block_number = [0-9]*/log_sync_start_block_number = 180000/' config.toml
 
 screen -dmS zgs_node_session ../target/release/zgs_node --config config.toml
