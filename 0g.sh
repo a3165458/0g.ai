@@ -308,9 +308,52 @@ function restart_storage() {
     screen -S zgs_node_session -X quit
     # 启动
     screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config.toml
-echo '====================== 启动成功，请通过screen -r zgs_node_session 查询 ==========================='
+    echo '====================== 启动成功，请通过screen -r zgs_node_session 查询 ==========================='
 
 }
+
+# 修改日志等级
+function change_storage_log_level() {
+    echo "DEBUG(1) > INFO(2) > WARN(3) > ERROR(4)"
+    echo "DEBUG 等级日志文件最大，ERROR 等级日志文件最小"
+    read -p "请选择日志等级(1-4): " level
+    case "$level" in
+        1)
+            echo "debug,hyper=info,h2=info" > $HOME/0g-storage-node/run/log_config ;;
+        2)
+            echo "info,hyper=info,h2=info" > $HOME/0g-storage-node/run/log_config ;;
+        3)
+            echo "warn,hyper=info,h2=info" > $HOME/0g-storage-node/run/log_config ;;
+        4)
+            echo "error,hyper=info,h2=info" > $HOME/0g-storage-node/run/log_config ;;
+    esac
+    echo "修改完成，请重新启动存储节点"
+}
+
+
+# 统计日志文件大小
+function storage_logs_disk_usage(){
+    du -sh ~/0g-storage-node/run/log/
+    du -sh ~/0g-storage-node/run/log/*
+}
+
+
+# 删除存储节点日志
+function delete_storage_logs(){
+    echo "确定删除存储节点日志？[Y/N]"
+    read -r -p "请确认: " response
+        case "$response" in
+        [yY][eE][sS]|[yY])
+            rm -r ~/0g-storage-node/run/log/*
+            echo "删除完成，请重启存储节点"
+            ;;
+        *)
+            echo "取消操作"
+            ;;
+    esac
+
+}
+
 
 # 转换 ETH 地址
 function transfer_EIP() {
@@ -388,11 +431,14 @@ function main_menu() {
         echo "13. 查看存储节点日志"
         echo "14. 重启存储节点"
         echo "15. 卸载存储节点"
+        echo "18. 修改日志等级"
+        echo "19. 统计日志文件大小"
+        echo "20. 删除存储节点日志"
         echo "=======================备份功能================================"
         echo "16. 备份验证者私钥"
         echo "======================================================="
         echo "17. 更新本脚本"
-        read -p "请输入选项（1-18）: " OPTION
+        read -p "请输入选项（1-20）: " OPTION
 
         case $OPTION in
         1) install_node ;;
@@ -412,6 +458,9 @@ function main_menu() {
         15) uninstall_storage_node ;;
         16) export_priv_validator_key ;;
         17) update_script ;;
+        18) change_storage_log_level ;;
+        19) storage_logs_disk_usage ;;
+        20) delete_storage_logs ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
