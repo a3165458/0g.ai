@@ -202,7 +202,7 @@ function install_storage_node() {
     sudo apt-get install clang cmake build-essential git screen cargo -y
 
 
-# 安装Go
+# 安装 Go
     sudo rm -rf /usr/local/go
     curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local
     echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> $HOME/.bash_profile
@@ -211,9 +211,9 @@ function install_storage_node() {
 
 
 # 克隆仓库
-git clone -b v0.3.3 https://github.com/0glabs/0g-storage-node.git
+git clone -b v0.3.4 https://github.com/0glabs/0g-storage-node.git
 
-#进入对应目录构建
+# 进入对应目录构建
 cd 0g-storage-node
 git submodule update --init
 
@@ -221,23 +221,27 @@ git submodule update --init
 echo "准备构建，该步骤消耗一段时间。请保持 SSH 不要断开。看到 Finish 字样为构建完成。"
 cargo build --release
 
-#后台运行
-cd run
+# 编辑配置
+
+read -p "请输入你想导入的EVM钱包私钥，不要有0x: " miner_key
+read -p "请输入设备 IP 地址（本地机器请直接回车跳过）: " public_address
+read -p "请输入使用的 JSON-RPC : " json_rpc
+sed -i '
+s|# network_enr_address = ""|network_enr_address = "'$public_address'"|
+s|# rpc_listen_address = ".*"|rpc_listen_address = "0.0.0.0:5678"|
+s|# network_boot_nodes = \[\]|network_boot_nodes = \[\"/ip4/54.219.26.22/udp/1234/p2p/16Uiu2HAmTVDGNhkHD98zDnJxQWu3i1FL1aFYeh9wiQTNu4pDCgps\",\"/ip4/52.52.127.117/udp/1234/p2p/16Uiu2HAkzRjxK2gorngB1Xq84qDrT4hSVznYDHj6BkbaE4SGx9oS\",\"/ip4/18.167.69.68/udp/1234/p2p/16Uiu2HAm2k6ua2mGgvZ8rTMV8GhpW71aVzkQWy7D37TTDuLCpgmX\"\]|
+s|# log_contract_address = ""|log_contract_address = "0x8873cc79c5b3b5666535C825205C9a128B1D75F1"|
+s|# mine_contract_address = ""|mine_contract_address = "0x85F6722319538A805ED5733c5F4882d96F1C7384"|
+s|# blockchain_rpc_endpoint = ".*"|blockchain_rpc_endpoint = "'$json_rpc'"|
+s|# log_sync_start_block_number = 0|log_sync_start_block_number = 802|
+s|# miner_key = ""|miner_key = "'$miner_key'"|
+' $HOME/0g-storage-node/run/config.toml
+
+# 启动
+screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config.toml
 
 
-read -p "请输入你想导入的EVM钱包私钥，不要有0x: " minerkey
-read -p "请输入设备IP地址: " new_address
-
-sed -i "s/miner_key = \"\"/miner_key = \"$minerkey\"/" config.toml
-sed -i "s/log_contract_address = \"\"/log_contract_address = \"0x8873cc79c5b3b5666535C825205C9a128B1D75F1\"/" config.toml
-sed -i "s/mine_contract_address = \"\"/mine_contract_address = \"0x85F6722319538A805ED5733c5F4882d96F1C7384\"/" config.toml
-sed -i "s|^# *network_enr_address = \".*\"|network_enr_address = \"$new_address\"|" config.toml
-sed -i 's/log_sync_start_block_number = [0-9]*/log_sync_start_block_number = 180000/' config.toml
-
-screen -dmS zgs_node_session ../target/release/zgs_node --config config.toml
-
-echo '====================== 安装完成，使用screen命令查询即可 ==========================='
-
+echo '====================== 安装完成，使用 screen -ls 命令查询即可 ==========================='
 
 }
 
