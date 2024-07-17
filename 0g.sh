@@ -302,9 +302,12 @@ function check_storage_status() {
     tail -f "$(find ~/0g-storage-node/run/log/ -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d' ' -f2-)"
 }
 
-# 启动存储节点
-function start_storage() {
-cd 0g-storage-node/run && screen -dmS zgs_node_session ../target/release/zgs_node --config config.toml
+# 重启存储节点
+function restart_storage() {
+    # 退出现有进程
+    screen -S zgs_node_session -X quit
+    # 启动
+    screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config.toml
 echo '====================== 启动成功，请通过screen -r zgs_node_session 查询 ==========================='
 
 }
@@ -383,10 +386,10 @@ function main_menu() {
         echo "=======================存储节点功能================================"
         echo "12. 创建存储节点"
         echo "13. 查看存储节点日志"
-        echo "14. 单独启动存储节点代码，适用于需要修改存储路径等功能修改过后使用"
-        echo "16. 卸载存储节点(卸载前请先停止对应的存储节点进程)"
+        echo "14. 重启存储节点"
+        echo "15. 卸载存储节点"
         echo "=======================备份功能================================"
-        echo "15. 备份验证者私钥"
+        echo "16. 备份验证者私钥"
         echo "======================================================="
         echo "17. 更新本脚本"
         read -p "请输入选项（1-18）: " OPTION
@@ -405,9 +408,9 @@ function main_menu() {
         11) transfer_EIP ;;
         12) install_storage_node ;;
         13) check_storage_status ;;
-        14) start_storage ;;
-        15) export_priv_validator_key ;;
-        16) uninstall_storage_node ;;
+        14) restart_storage ;;
+        15) uninstall_storage_node ;;
+        16) export_priv_validator_key ;;
         17) update_script ;;
         *) echo "无效选项。" ;;
         esac
