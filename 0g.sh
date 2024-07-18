@@ -308,6 +308,7 @@ function restart_storage() {
     # 退出现有进程
     screen -S zgs_node_session -X quit
     # 启动
+    cd ~/0g-storage-node/run
     screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config.toml
     echo '====================== 启动成功，请通过screen -r zgs_node_session 查询 ==========================='
 
