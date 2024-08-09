@@ -225,16 +225,16 @@ cargo build --release
 # 编辑配置
 
 read -p "请输入你想导入的EVM钱包私钥，不要有0x: " miner_key
-read -p "请输入设备 IP 地址（本地机器请直接回车跳过）: " public_address
+read -p "请输入设备 IP 地址（本地机器请输入127.0.0.1）: " public_address
 read -p "请输入使用的 JSON-RPC : " json_rpc
 sed -i '
 s|# network_enr_address = ""|network_enr_address = "'$public_address'"|
 s|# rpc_listen_address = ".*"|rpc_listen_address = "0.0.0.0:5678"|
 s|# network_boot_nodes = \[\]|network_boot_nodes = \[\"/ip4/54.219.26.22/udp/1234/p2p/16Uiu2HAmTVDGNhkHD98zDnJxQWu3i1FL1aFYeh9wiQTNu4pDCgps\",\"/ip4/52.52.127.117/udp/1234/p2p/16Uiu2HAkzRjxK2gorngB1Xq84qDrT4hSVznYDHj6BkbaE4SGx9oS\",\"/ip4/18.167.69.68/udp/1234/p2p/16Uiu2HAm2k6ua2mGgvZ8rTMV8GhpW71aVzkQWy7D37TTDuLCpgmX\"\]|
-s|# log_contract_address = ""|log_contract_address = "0x8873cc79c5b3b5666535C825205C9a128B1D75F1"|
-s|# mine_contract_address = ""|mine_contract_address = "0x85F6722319538A805ED5733c5F4882d96F1C7384"|
+s|# log_contract_address = ""|log_contract_address = "0xB7e39604f47c0e4a6Ad092a281c1A8429c2440d3"|
+s|# mine_contract_address = ""|mine_contract_address = "0x6176AA095C47A7F79deE2ea473B77ebf50035421"|
 s|# blockchain_rpc_endpoint = ".*"|blockchain_rpc_endpoint = "'$json_rpc'"|
-s|# log_sync_start_block_number = 0|log_sync_start_block_number = 802|
+s|# log_sync_start_block_number = 0|log_sync_start_block_number = 401178|
 s|# miner_key = ""|miner_key = "'$miner_key'"|
 ' $HOME/0g-storage-node/run/config.toml
 
@@ -300,8 +300,13 @@ read -p "请输入钱包名称: " wallet_name
 }
 
 # 查看存储节点日志
-function check_storage_status() {
+function check_storage_logs() {
     tail -f "$(find ~/0g-storage-node/run/log/ -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d' ' -f2-)"
+}
+
+# 过滤错误日志
+function check_storage_error() {
+    tail -f ~/0g-storage-node/run/log/zgs.log.$(TZ=UTC date +%Y-%m-%d) | grep ERROR
 }
 
 # 重启存储节点
@@ -430,18 +435,19 @@ function main_menu() {
         echo "10. 给自己验证者地址质押代币"
         echo "11. 转换ETH地址"
         echo "=======================存储节点功能================================"
-        echo "12. 创建存储节点"
+        echo "12. 安装存储节点"
         echo "13. 查看存储节点日志"
-        echo "14. 重启存储节点"
-        echo "15. 卸载存储节点"
-        echo "18. 修改日志等级"
-        echo "19. 统计日志文件大小"
-        echo "20. 删除存储节点日志"
+        echo "14. 过滤错误日志"
+        echo "15. 重启存储节点"
+        echo "16. 卸载存储节点"
+        echo "17. 修改日志等级"
+        echo "18. 统计日志文件大小"
+        echo "19. 删除存储节点日志"
         echo "=======================备份功能================================"
-        echo "16. 备份验证者私钥"
+        echo "21. 备份验证者私钥"
         echo "======================================================="
-        echo "17. 更新本脚本"
-        read -p "请输入选项（1-20）: " OPTION
+        echo "20. 更新本脚本"
+        read -p "请输入选项（1-21）: " OPTION
 
         case $OPTION in
         1) install_node ;;
@@ -456,14 +462,15 @@ function main_menu() {
         10) delegate_self_validator ;;
         11) transfer_EIP ;;
         12) install_storage_node ;;
-        13) check_storage_status ;;
-        14) restart_storage ;;
-        15) uninstall_storage_node ;;
-        16) export_priv_validator_key ;;
-        17) update_script ;;
-        18) change_storage_log_level ;;
-        19) storage_logs_disk_usage ;;
-        20) delete_storage_logs ;;
+        13) check_storage_logs ;;
+        14) check_storage_error;;
+        15) restart_storage ;;
+        16) uninstall_storage_node ;;
+        17) change_storage_log_level ;;
+        18) storage_logs_disk_usage ;;
+        19) delete_storage_logs ;;
+        20) update_script ;;
+        21) export_priv_validator_key ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
