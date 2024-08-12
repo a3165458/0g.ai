@@ -71,8 +71,9 @@ function install_node() {
     fi
 
     # 安装所有二进制文件
-    git clone -b v0.2.3 https://github.com/0glabs/0g-chain.git
-    ./0g-chain/networks/testnet/install.sh
+    git clone -b v0.3.0 https://github.com/0glabs/0g-chain.git
+    cd 0g-chain
+    make install
     source ~/.profile
 
     # 配置0gchaind
@@ -211,7 +212,7 @@ function install_storage_node() {
 
 
 # 克隆仓库
-git clone -b v0.3.4 https://github.com/0glabs/0g-storage-node.git
+git clone -b v0.4.0 https://github.com/0glabs/0g-storage-node.git
 
 # 进入对应目录构建
 cd 0g-storage-node
