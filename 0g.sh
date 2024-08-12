@@ -71,7 +71,7 @@ function install_node() {
     fi
 
     # 安装所有二进制文件
-    git clone -b v0.3.0 https://github.com/0glabs/0g-chain.git
+    git clone -b v0.3.1 https://github.com/0glabs/0g-chain.git
     cd 0g-chain
     make install
     source ~/.profile
@@ -88,16 +88,16 @@ function install_node() {
 
     # 配置创世文件
     rm ~/.0gchain/config/genesis.json
-    wget -P ~/.0gchain/config https://github.com/0glabs/0g-chain/releases/download/v0.2.3/genesis.json
+    wget -P ~/.0gchain/config https://public-snapshot-storage-develop.s3.ap-southeast-1.amazonaws.com/zerog/zgtendermint_16600-2/genesis.json
     0gchaind validate-genesis
 
     # 配置节点
     SEEDS="8f21742ea5487da6e0697ba7d7b36961d3599567@og-testnet-seed.itrocket.net:47656"
-    PEERS="4d98cf3cb2a61238a0b1557596cdc4b306472cb9@95.216.228.91:13456,c44baa3836d07f9ed9a832f819bcf19fda67cc5d@95.216.42.217:13456,81987895a11f6689ada254c6b57932ab7ed909b6@54.241.167.190:26656,010fb4de28667725a4fef26cdc7f9452cc34b16d@54.176.175.48:26656,e9b4bc203197b62cc7e6a80a64742e752f4210d5@54.193.250.204:26656,68b9145889e7576b652ca68d985826abd46ad660@18.166.164.232:26656"
+    PEERS="80fa309afab4a35323018ac70a40a446d3ae9caf@og-testnet-peer.itrocket.net:11656,9dbb76298d1625ebcc47d08fa7e7911967b63b61@45.159.221.57:26656,a2caf26a86a4989e26943e496173e7b22831c88a@198.7.116.141:12656,0ae19691f97f5797694c253bc06c79c8b58ea2a8@85.190.242.81:26656,c0d35052a7612d992f721b25f186a5d1f569405e@195.201.194.188:26656,8bd2797c8ece0f099a1c31f98e5648d192d8cd54@38.242.146.162:26656,c85eaa1b3cbe4d7fb19138e5a5dc4111491e6e03@115.78.229.59:10156,fa08f548e8d34b6c72ed9e7495a59ae6be656da8@109.199.97.178:12656,ffdf7a8cc6dbbd22e25b1590f61da149349bdc2e@135.181.229.206:26656,56ee4c337848a70a43887531b5f1ca211bac1a34@185.187.170.125:26656"
     sed -i "s/persistent_peers = \"\"/persistent_peers = \"$PEERS\"/" $HOME/.0gchain/config/config.toml
     sed -i "s/seeds = \"\"/seeds = \"$SEEDS\"/" $HOME/.0gchain/config/config.toml
     sed -i -e 's/max_num_inbound_peers = 40/max_num_inbound_peers = 100/' -e 's/max_num_outbound_peers = 10/max_num_outbound_peers = 100/' $HOME/.0gchain/config/config.toml
-    wget -O $HOME/.0gchain/config/addrbook.json https://testnet-files.itrocket.net/og/addrbook.json
+    wget -O $HOME/.0gchain/config/addrbook.json https://server-5.itrocket.net/testnet/og/addrbook.json
 
 
     # 配置裁剪
@@ -111,9 +111,14 @@ function install_node() {
     sed -i -e "s%^address = \"tcp://localhost:1317\"%address = \"tcp://0.0.0.0:13417\"%; s%^address = \":8080\"%address = \":13480\"%; s%^address = \"0.0.0.0:9090\"%address = \"0.0.0.0:13490\"%; s%^address = \"localhost:9091\"%address = \"0.0.0.0:13491\"%; s%:8545%:13445%; s%:8546%:13446%; s%:6065%:13465%" $HOME/.0gchain/config/app.toml
     source $HOME/.bash_profile
 
-    # 使用 PM2 启动节点进程
-    pm2 start 0gchaind -- start && pm2 save && pm2 startup
+    # 下载快照
+    cp $HOME/.0gchain/data/priv_validator_state.json $HOME/.0gchain/priv_validator_state.json.backup
+    rm -rf $HOME/.0gchain/data
+    curl https://server-5.itrocket.net/testnet/og/og_2024-08-12_625716_snap.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.0gchain
+    mv $HOME/.0gchain/priv_validator_state.json.backup $HOME/.0gchain/data/priv_validator_state.json
 
+    # 使用 PM2 启动节点进程
+    pm2 start 0gchaind -- start --log_output_console --home ~/.0gchain && pm2 save && pm2 startup
     pm2 restart 0gchaind
 
     echo '====================== 安装完成,请退出脚本后执行 source $HOME/.bash_profile 以加载环境变量==========================='
