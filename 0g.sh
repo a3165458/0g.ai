@@ -212,7 +212,7 @@ function install_storage_node() {
 
 
 # 克隆仓库
-git clone -b v0.4.0 https://github.com/0glabs/0g-storage-node.git
+git clone -b v0.4.2 https://github.com/0glabs/0g-storage-node.git
 
 # 进入对应目录构建
 cd 0g-storage-node
@@ -229,18 +229,13 @@ read -p "请输入设备 IP 地址（本地机器请输入127.0.0.1）: " public
 read -p "请输入使用的 JSON-RPC : " json_rpc
 sed -i '
 s|# network_enr_address = ""|network_enr_address = "'$public_address'"|
-s|# rpc_listen_address = ".*"|rpc_listen_address = "0.0.0.0:5678"|
-s|# network_boot_nodes = \[\]|network_boot_nodes = \[\"/ip4/54.219.26.22/udp/1234/p2p/16Uiu2HAmTVDGNhkHD98zDnJxQWu3i1FL1aFYeh9wiQTNu4pDCgps\",\"/ip4/52.52.127.117/udp/1234/p2p/16Uiu2HAkzRjxK2gorngB1Xq84qDrT4hSVznYDHj6BkbaE4SGx9oS\",\"/ip4/18.167.69.68/udp/1234/p2p/16Uiu2HAm2k6ua2mGgvZ8rTMV8GhpW71aVzkQWy7D37TTDuLCpgmX\"\]|
-s|# log_contract_address = ""|log_contract_address = "0xB7e39604f47c0e4a6Ad092a281c1A8429c2440d3"|
-s|# mine_contract_address = ""|mine_contract_address = "0x6176AA095C47A7F79deE2ea473B77ebf50035421"|
 s|# blockchain_rpc_endpoint = ".*"|blockchain_rpc_endpoint = "'$json_rpc'"|
-s|# log_sync_start_block_number = 0|log_sync_start_block_number = 401178|
 s|# miner_key = ""|miner_key = "'$miner_key'"|
-' $HOME/0g-storage-node/run/config.toml
+' $HOME/0g-storage-node/run/config-testnet-turbo.toml
 
 # 启动
 cd ~/0g-storage-node/run
-screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config.toml
+screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config-testnet-turbo.toml
 
 
 echo '====================== 安装完成，使用 screen -ls 命令查询即可 ==========================='
@@ -315,7 +310,7 @@ function restart_storage() {
     screen -S zgs_node_session -X quit
     # 启动
     cd ~/0g-storage-node/run
-    screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config.toml
+    screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config-testnet-turbo.toml
     echo '====================== 启动成功，请通过screen -r zgs_node_session 查询 ==========================='
 
 }
