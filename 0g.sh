@@ -180,26 +180,26 @@ function check_sync_status() {
 # 创建验证者
 function add_validator() {
 
-read -p "请输入您的钱包名称: " wallet_name
-read -p "请输入您想设置的验证者的名字: " validator_name
-read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
+    read -p "请输入您的钱包名称: " wallet_name
+    read -p "请输入您想设置的验证者的名字: " validator_name
+    read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
 
 
-0gchaind tx staking create-validator \
-  --amount=1000000ua0gi \
-  --pubkey=$(0gchaind tendermint show-validator) \
-  --moniker=$validator_name \
-  --chain-id=zgtendermint_16600-2 \
-  --commission-rate=0.05 \
-  --commission-max-rate=0.10 \
-  --commission-max-change-rate=0.01 \
-  --min-self-delegation=1 \
-  --from=$wallet_name \
-  --identity="" \
-  --website="" \
-  --details="$details" \
-  --gas=auto \
-  --gas-adjustment=1.4
+    0gchaind tx staking create-validator \
+    --amount=1000000ua0gi \
+    --pubkey=$(0gchaind tendermint show-validator) \
+    --moniker=$validator_name \
+    --chain-id=zgtendermint_16600-2 \
+    --commission-rate=0.05 \
+    --commission-max-rate=0.10 \
+    --commission-max-change-rate=0.01 \
+    --min-self-delegation=1 \
+    --from=$wallet_name \
+    --identity="" \
+    --website="" \
+    --details="$details" \
+    --gas=auto \
+    --gas-adjustment=1.4
 }
 
 function install_storage_node() {
@@ -208,7 +208,7 @@ function install_storage_node() {
     sudo apt-get install clang cmake build-essential git screen cargo -y
 
 
-# 安装 Go
+    # 安装 Go
     sudo rm -rf /usr/local/go
     curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local
     echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> $HOME/.bash_profile
@@ -216,56 +216,56 @@ function install_storage_node() {
     source $HOME/.bash_profile
 
 
-# 克隆仓库
-git clone -b v0.4.2 https://github.com/0glabs/0g-storage-node.git
+    # 克隆仓库
+    git clone -b v0.4.2 https://github.com/0glabs/0g-storage-node.git
 
-# 进入对应目录构建
-cd 0g-storage-node
-git submodule update --init
+    # 进入对应目录构建
+    cd 0g-storage-node
+    git submodule update --init
 
-# 构建代码
-echo "准备构建，该步骤消耗一段时间。请保持 SSH 不要断开。看到 Finish 字样为构建完成。"
-cargo build --release
+    # 构建代码
+    echo "准备构建，该步骤消耗一段时间。请保持 SSH 不要断开。看到 Finish 字样为构建完成。"
+    cargo build --release
 
-# 编辑配置
+    # 编辑配置
 
-read -p "请输入你想导入的EVM钱包私钥，不要有0x: " miner_key
-read -p "请输入设备 IP 地址（本地机器请输入127.0.0.1）: " public_address
-read -p "请输入使用的 JSON-RPC : " json_rpc
-sed -i '
-s|# network_enr_address = ""|network_enr_address = "'$public_address'"|
-s|# blockchain_rpc_endpoint = ".*"|blockchain_rpc_endpoint = "'$json_rpc'"|
-s|# miner_key = ""|miner_key = "'$miner_key'"|
-' $HOME/0g-storage-node/run/config-testnet-turbo.toml
+    read -p "请输入你想导入的EVM钱包私钥，不要有0x: " miner_key
+    read -p "请输入设备 IP 地址（本地机器请输入127.0.0.1）: " public_address
+    read -p "请输入使用的 JSON-RPC : " json_rpc
+    sed -i '
+    s|# network_enr_address = ""|network_enr_address = "'$public_address'"|
+    s|# blockchain_rpc_endpoint = ".*"|blockchain_rpc_endpoint = "'$json_rpc'"|
+    s|# miner_key = ""|miner_key = "'$miner_key'"|
+    ' $HOME/0g-storage-node/run/config-testnet-turbo.toml
 
-# 启动
-cd ~/0g-storage-node/run
-screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config-testnet-turbo.toml
+    # 启动
+    cd ~/0g-storage-node/run
+    screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config-testnet-turbo.toml
 
 
-echo '====================== 安装完成，使用 screen -ls 命令查询即可 ==========================='
+    echo '====================== 安装完成，使用 screen -ls 命令查询即可 ==========================='
 
 }
 
 
 function install_storage_kv() {
 
-# 克隆仓库
-git clone https://github.com/0glabs/0g-storage-kv.git
+    # 克隆仓库
+    git clone https://github.com/0glabs/0g-storage-kv.git
 
 
-#进入对应目录构建
-cd 0g-storage-kv
-git submodule update --init
+    #进入对应目录构建
+    cd 0g-storage-kv
+    git submodule update --init
 
-# 构建代码
-cargo build --release
+    # 构建代码
+    cargo build --release
 
-#后台运行
-cd run
+    #后台运行
+    cd run
 
-echo "请输入RPC节点信息: "
-read blockchain_rpc_endpoint
+    echo "请输入RPC节点信息: "
+    read blockchain_rpc_endpoint
 
 
 cat > config.toml <<EOF
@@ -286,16 +286,16 @@ log_sync_start_block_number = 670000
 
 EOF
 
-echo "配置已成功写入 config.toml 文件"
-screen -dmS storage_kv ../target/release/zgs_kv --config config.toml
+    echo "配置已成功写入 config.toml 文件"
+    screen -dmS storage_kv ../target/release/zgs_kv --config config.toml
 
 }
 
 # 给自己地址验证者质押
 function delegate_self_validator() {
-read -p "请输入质押代币数量(单位为ua0gai,比如你有1000000个ua0gai，留点水给自己，输入900000回车就行): " math
-read -p "请输入钱包名称: " wallet_name
-0gchaind tx staking delegate $(0gchaind keys show $wallet_name --bech val -a) ${math}ua0gi --from $wallet_name   --gas=auto --gas-adjustment=1.4 -y
+    read -p "请输入质押代币数量(单位为ua0gai,比如你有1000000个ua0gai，留点水给自己，输入900000回车就行): " math
+    read -p "请输入钱包名称: " wallet_name
+    0gchaind tx staking delegate $(0gchaind keys show $wallet_name --bech val -a) ${math}ua0gi --from $wallet_name   --gas=auto --gas-adjustment=1.4 -y
 
 }
 
@@ -365,8 +365,8 @@ function delete_storage_logs(){
 
 # 转换 ETH 地址
 function transfer_EIP() {
-read -p "请输入你的钱包名称: " wallet_name
-echo "0x$(0gchaind debug addr $(0gchaind keys show $wallet_name -a) | grep hex | awk '{print $3}')"
+    read -p "请输入你的钱包名称: " wallet_name
+    echo "0x$(0gchaind debug addr $(0gchaind keys show $wallet_name -a) | grep hex | awk '{print $3}')"
 
 }
 
