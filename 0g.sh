@@ -71,7 +71,7 @@ function install_node() {
     fi
 
     # 安装所有二进制文件
-    git clone -b v0.3.0 https://github.com/0glabs/0g-chain.git
+    git clone -b v0.3.1 https://github.com/0glabs/0g-chain.git
     cd 0g-chain
     make install
     source ~/.profile
@@ -88,16 +88,16 @@ function install_node() {
 
     # 配置创世文件
     rm ~/.0gchain/config/genesis.json
-    wget -P ~/.0gchain/config https://github.com/0glabs/0g-chain/releases/download/v0.2.3/genesis.json
+    wget -P ~/.0gchain/config https://public-snapshot-storage-develop.s3.ap-southeast-1.amazonaws.com/zerog/zgtendermint_16600-2/genesis.json
     0gchaind validate-genesis
 
     # 配置节点
     SEEDS="8f21742ea5487da6e0697ba7d7b36961d3599567@og-testnet-seed.itrocket.net:47656"
-    PEERS="4d98cf3cb2a61238a0b1557596cdc4b306472cb9@95.216.228.91:13456,c44baa3836d07f9ed9a832f819bcf19fda67cc5d@95.216.42.217:13456,81987895a11f6689ada254c6b57932ab7ed909b6@54.241.167.190:26656,010fb4de28667725a4fef26cdc7f9452cc34b16d@54.176.175.48:26656,e9b4bc203197b62cc7e6a80a64742e752f4210d5@54.193.250.204:26656,68b9145889e7576b652ca68d985826abd46ad660@18.166.164.232:26656"
+    PEERS="80fa309afab4a35323018ac70a40a446d3ae9caf@og-testnet-peer.itrocket.net:11656,9dbb76298d1625ebcc47d08fa7e7911967b63b61@45.159.221.57:26656,a2caf26a86a4989e26943e496173e7b22831c88a@198.7.116.141:12656,0ae19691f97f5797694c253bc06c79c8b58ea2a8@85.190.242.81:26656,c0d35052a7612d992f721b25f186a5d1f569405e@195.201.194.188:26656,8bd2797c8ece0f099a1c31f98e5648d192d8cd54@38.242.146.162:26656,c85eaa1b3cbe4d7fb19138e5a5dc4111491e6e03@115.78.229.59:10156,fa08f548e8d34b6c72ed9e7495a59ae6be656da8@109.199.97.178:12656,ffdf7a8cc6dbbd22e25b1590f61da149349bdc2e@135.181.229.206:26656,56ee4c337848a70a43887531b5f1ca211bac1a34@185.187.170.125:26656"
     sed -i "s/persistent_peers = \"\"/persistent_peers = \"$PEERS\"/" $HOME/.0gchain/config/config.toml
     sed -i "s/seeds = \"\"/seeds = \"$SEEDS\"/" $HOME/.0gchain/config/config.toml
     sed -i -e 's/max_num_inbound_peers = 40/max_num_inbound_peers = 100/' -e 's/max_num_outbound_peers = 10/max_num_outbound_peers = 100/' $HOME/.0gchain/config/config.toml
-    wget -O $HOME/.0gchain/config/addrbook.json https://testnet-files.itrocket.net/og/addrbook.json
+    wget -O $HOME/.0gchain/config/addrbook.json https://server-5.itrocket.net/testnet/og/addrbook.json
 
 
     # 配置裁剪
@@ -111,9 +111,14 @@ function install_node() {
     sed -i -e "s%^address = \"tcp://localhost:1317\"%address = \"tcp://0.0.0.0:13417\"%; s%^address = \":8080\"%address = \":13480\"%; s%^address = \"0.0.0.0:9090\"%address = \"0.0.0.0:13490\"%; s%^address = \"localhost:9091\"%address = \"0.0.0.0:13491\"%; s%:8545%:13445%; s%:8546%:13446%; s%:6065%:13465%" $HOME/.0gchain/config/app.toml
     source $HOME/.bash_profile
 
-    # 使用 PM2 启动节点进程
-    pm2 start 0gchaind -- start && pm2 save && pm2 startup
+    # 下载快照
+    cp $HOME/.0gchain/data/priv_validator_state.json $HOME/.0gchain/priv_validator_state.json.backup
+    rm -rf $HOME/.0gchain/data
+    curl https://server-5.itrocket.net/testnet/og/og_2024-08-12_625716_snap.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.0gchain
+    mv $HOME/.0gchain/priv_validator_state.json.backup $HOME/.0gchain/data/priv_validator_state.json
 
+    # 使用 PM2 启动节点进程
+    pm2 start 0gchaind -- start --log_output_console --home ~/.0gchain && pm2 save && pm2 startup
     pm2 restart 0gchaind
 
     echo '====================== 安装完成,请退出脚本后执行 source $HOME/.bash_profile 以加载环境变量==========================='
@@ -175,26 +180,26 @@ function check_sync_status() {
 # 创建验证者
 function add_validator() {
 
-read -p "请输入您的钱包名称: " wallet_name
-read -p "请输入您想设置的验证者的名字: " validator_name
-read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
+    read -p "请输入您的钱包名称: " wallet_name
+    read -p "请输入您想设置的验证者的名字: " validator_name
+    read -p "请输入您的验证者详情（例如'吊毛资本'）: " details
 
 
-0gchaind tx staking create-validator \
-  --amount=1000000ua0gi \
-  --pubkey=$(0gchaind tendermint show-validator) \
-  --moniker=$validator_name \
-  --chain-id=zgtendermint_16600-2 \
-  --commission-rate=0.05 \
-  --commission-max-rate=0.10 \
-  --commission-max-change-rate=0.01 \
-  --min-self-delegation=1 \
-  --from=$wallet_name \
-  --identity="" \
-  --website="" \
-  --details="$details" \
-  --gas=auto \
-  --gas-adjustment=1.4
+    0gchaind tx staking create-validator \
+    --amount=1000000ua0gi \
+    --pubkey=$(0gchaind tendermint show-validator) \
+    --moniker=$validator_name \
+    --chain-id=zgtendermint_16600-2 \
+    --commission-rate=0.05 \
+    --commission-max-rate=0.10 \
+    --commission-max-change-rate=0.01 \
+    --min-self-delegation=1 \
+    --from=$wallet_name \
+    --identity="" \
+    --website="" \
+    --details="$details" \
+    --gas=auto \
+    --gas-adjustment=1.4
 }
 
 function install_storage_node() {
@@ -203,7 +208,7 @@ function install_storage_node() {
     sudo apt-get install clang cmake build-essential git screen cargo -y
 
 
-# 安装 Go
+    # 安装 Go
     sudo rm -rf /usr/local/go
     curl -L https://go.dev/dl/go1.22.0.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local
     echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> $HOME/.bash_profile
@@ -211,61 +216,56 @@ function install_storage_node() {
     source $HOME/.bash_profile
 
 
-# 克隆仓库
-git clone -b v0.4.0 https://github.com/0glabs/0g-storage-node.git
+    # 克隆仓库
+    git clone -b v0.4.2 https://github.com/0glabs/0g-storage-node.git
 
-# 进入对应目录构建
-cd 0g-storage-node
-git submodule update --init
+    # 进入对应目录构建
+    cd 0g-storage-node
+    git submodule update --init
 
-# 构建代码
-echo "准备构建，该步骤消耗一段时间。请保持 SSH 不要断开。看到 Finish 字样为构建完成。"
-cargo build --release
+    # 构建代码
+    echo "准备构建，该步骤消耗一段时间。请保持 SSH 不要断开。看到 Finish 字样为构建完成。"
+    cargo build --release
 
-# 编辑配置
+    # 编辑配置
 
-read -p "请输入你想导入的EVM钱包私钥，不要有0x: " miner_key
-read -p "请输入设备 IP 地址（本地机器请直接回车跳过）: " public_address
-read -p "请输入使用的 JSON-RPC : " json_rpc
-sed -i '
-s|# network_enr_address = ""|network_enr_address = "'$public_address'"|
-s|# rpc_listen_address = ".*"|rpc_listen_address = "0.0.0.0:5678"|
-s|# network_boot_nodes = \[\]|network_boot_nodes = \[\"/ip4/54.219.26.22/udp/1234/p2p/16Uiu2HAmTVDGNhkHD98zDnJxQWu3i1FL1aFYeh9wiQTNu4pDCgps\",\"/ip4/52.52.127.117/udp/1234/p2p/16Uiu2HAkzRjxK2gorngB1Xq84qDrT4hSVznYDHj6BkbaE4SGx9oS\",\"/ip4/18.167.69.68/udp/1234/p2p/16Uiu2HAm2k6ua2mGgvZ8rTMV8GhpW71aVzkQWy7D37TTDuLCpgmX\"\]|
-s|# log_contract_address = ""|log_contract_address = "0x8873cc79c5b3b5666535C825205C9a128B1D75F1"|
-s|# mine_contract_address = ""|mine_contract_address = "0x85F6722319538A805ED5733c5F4882d96F1C7384"|
-s|# blockchain_rpc_endpoint = ".*"|blockchain_rpc_endpoint = "'$json_rpc'"|
-s|# log_sync_start_block_number = 0|log_sync_start_block_number = 802|
-s|# miner_key = ""|miner_key = "'$miner_key'"|
-' $HOME/0g-storage-node/run/config.toml
+    read -p "请输入你想导入的EVM钱包私钥，不要有0x: " miner_key
+    read -p "请输入设备 IP 地址（本地机器请输入127.0.0.1）: " public_address
+    read -p "请输入使用的 JSON-RPC : " json_rpc
+    sed -i '
+    s|# network_enr_address = ""|network_enr_address = "'$public_address'"|
+    s|# blockchain_rpc_endpoint = ".*"|blockchain_rpc_endpoint = "'$json_rpc'"|
+    s|# miner_key = ""|miner_key = "'$miner_key'"|
+    ' $HOME/0g-storage-node/run/config-testnet-turbo.toml
 
-# 启动
-cd ~/0g-storage-node/run
-screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config.toml
+    # 启动
+    cd ~/0g-storage-node/run
+    screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config-testnet-turbo.toml
 
 
-echo '====================== 安装完成，使用 screen -ls 命令查询即可 ==========================='
+    echo '====================== 安装完成，使用 screen -ls 命令查询即可 ==========================='
 
 }
 
 
 function install_storage_kv() {
 
-# 克隆仓库
-git clone https://github.com/0glabs/0g-storage-kv.git
+    # 克隆仓库
+    git clone https://github.com/0glabs/0g-storage-kv.git
 
 
-#进入对应目录构建
-cd 0g-storage-kv
-git submodule update --init
+    #进入对应目录构建
+    cd 0g-storage-kv
+    git submodule update --init
 
-# 构建代码
-cargo build --release
+    # 构建代码
+    cargo build --release
 
-#后台运行
-cd run
+    #后台运行
+    cd run
 
-echo "请输入RPC节点信息: "
-read blockchain_rpc_endpoint
+    echo "请输入RPC节点信息: "
+    read blockchain_rpc_endpoint
 
 
 cat > config.toml <<EOF
@@ -286,22 +286,27 @@ log_sync_start_block_number = 670000
 
 EOF
 
-echo "配置已成功写入 config.toml 文件"
-screen -dmS storage_kv ../target/release/zgs_kv --config config.toml
+    echo "配置已成功写入 config.toml 文件"
+    screen -dmS storage_kv ../target/release/zgs_kv --config config.toml
 
 }
 
 # 给自己地址验证者质押
 function delegate_self_validator() {
-read -p "请输入质押代币数量(单位为ua0gai,比如你有1000000个ua0gai，留点水给自己，输入900000回车就行): " math
-read -p "请输入钱包名称: " wallet_name
-0gchaind tx staking delegate $(0gchaind keys show $wallet_name --bech val -a) ${math}ua0gi --from $wallet_name   --gas=auto --gas-adjustment=1.4 -y
+    read -p "请输入质押代币数量(单位为ua0gai,比如你有1000000个ua0gai，留点水给自己，输入900000回车就行): " math
+    read -p "请输入钱包名称: " wallet_name
+    0gchaind tx staking delegate $(0gchaind keys show $wallet_name --bech val -a) ${math}ua0gi --from $wallet_name   --gas=auto --gas-adjustment=1.4 -y
 
 }
 
 # 查看存储节点日志
-function check_storage_status() {
+function check_storage_logs() {
     tail -f "$(find ~/0g-storage-node/run/log/ -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d' ' -f2-)"
+}
+
+# 过滤错误日志
+function check_storage_error() {
+    tail -f ~/0g-storage-node/run/log/zgs.log.$(TZ=UTC date +%Y-%m-%d) | grep ERROR
 }
 
 # 重启存储节点
@@ -310,7 +315,7 @@ function restart_storage() {
     screen -S zgs_node_session -X quit
     # 启动
     cd ~/0g-storage-node/run
-    screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config.toml
+    screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config-testnet-turbo.toml
     echo '====================== 启动成功，请通过screen -r zgs_node_session 查询 ==========================='
 
 }
@@ -360,8 +365,8 @@ function delete_storage_logs(){
 
 # 转换 ETH 地址
 function transfer_EIP() {
-read -p "请输入你的钱包名称: " wallet_name
-echo "0x$(0gchaind debug addr $(0gchaind keys show $wallet_name -a) | grep hex | awk '{print $3}')"
+    read -p "请输入你的钱包名称: " wallet_name
+    echo "0x$(0gchaind debug addr $(0gchaind keys show $wallet_name -a) | grep hex | awk '{print $3}')"
 
 }
 
@@ -430,18 +435,19 @@ function main_menu() {
         echo "10. 给自己验证者地址质押代币"
         echo "11. 转换ETH地址"
         echo "=======================存储节点功能================================"
-        echo "12. 创建存储节点"
+        echo "12. 安装存储节点"
         echo "13. 查看存储节点日志"
-        echo "14. 重启存储节点"
-        echo "15. 卸载存储节点"
-        echo "18. 修改日志等级"
-        echo "19. 统计日志文件大小"
-        echo "20. 删除存储节点日志"
+        echo "14. 过滤错误日志"
+        echo "15. 重启存储节点"
+        echo "16. 卸载存储节点"
+        echo "17. 修改日志等级"
+        echo "18. 统计日志文件大小"
+        echo "19. 删除存储节点日志"
         echo "=======================备份功能================================"
-        echo "16. 备份验证者私钥"
+        echo "21. 备份验证者私钥"
         echo "======================================================="
-        echo "17. 更新本脚本"
-        read -p "请输入选项（1-20）: " OPTION
+        echo "20. 更新本脚本"
+        read -p "请输入选项（1-21）: " OPTION
 
         case $OPTION in
         1) install_node ;;
@@ -456,14 +462,15 @@ function main_menu() {
         10) delegate_self_validator ;;
         11) transfer_EIP ;;
         12) install_storage_node ;;
-        13) check_storage_status ;;
-        14) restart_storage ;;
-        15) uninstall_storage_node ;;
-        16) export_priv_validator_key ;;
-        17) update_script ;;
-        18) change_storage_log_level ;;
-        19) storage_logs_disk_usage ;;
-        20) delete_storage_logs ;;
+        13) check_storage_logs ;;
+        14) check_storage_error;;
+        15) restart_storage ;;
+        16) uninstall_storage_node ;;
+        17) change_storage_log_level ;;
+        18) storage_logs_disk_usage ;;
+        19) delete_storage_logs ;;
+        20) update_script ;;
+        21) export_priv_validator_key ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
