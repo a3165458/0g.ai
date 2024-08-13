@@ -306,7 +306,7 @@ function check_storage_logs() {
 
 # 过滤错误日志
 function check_storage_error() {
-    tail -f ~/0g-storage-node/run/log/zgs.log.$(TZ=UTC date +%Y-%m-%d) | grep ERROR
+    tail -f -n50 ~/0g-storage-node/run/log/zgs.log.$(TZ=UTC date +%Y-%m-%d) | grep ERROR
 }
 
 # 重启存储节点
@@ -416,7 +416,7 @@ function update_script() {
 function main_menu() {
     while true; do
         clear
-        echo "脚本以及教程由推特用户大赌哥 @y95277777 编写，免费开源，请勿相信收费"
+        echo "脚本以及教程由推特用户大赌哥 @y95277777 编写，群友@rainy242869 维护更新,免费开源，请勿相信收费"
         echo "=======================0GAI节点安装================================"
         echo "=======================验证节点功能================================"
         echo "节点社区 Telegram 群组:https://t.me/niuwuriji"
