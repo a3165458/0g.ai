@@ -114,7 +114,7 @@ function install_node() {
     # 下载快照
     cp $HOME/.0gchain/data/priv_validator_state.json $HOME/.0gchain/priv_validator_state.json.backup
     rm -rf $HOME/.0gchain/data
-    curl https://server-5.itrocket.net/testnet/og/og_2024-08-12_625716_snap.tar.lz4 | lz4 -dc - | tar -xf - -C $HOME/.0gchain
+    curl -L https://snapshots.dadunode.com/0gchain/0gchain_latest_tar.lz4 | tar -I lz4 -xf - -C $HOME/.0gchain/data
     mv $HOME/.0gchain/priv_validator_state.json.backup $HOME/.0gchain/data/priv_validator_state.json
 
     # 使用 PM2 启动节点进程
