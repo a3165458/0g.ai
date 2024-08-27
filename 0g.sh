@@ -71,7 +71,7 @@ function install_node() {
     fi
 
     # 安装所有二进制文件
-    git clone -b v0.3.1 https://github.com/0glabs/0g-chain.git
+    git clone -b v0.3.2 https://github.com/0glabs/0g-chain.git
     cd 0g-chain
     make install
     source ~/.profile
