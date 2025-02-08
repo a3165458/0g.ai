@@ -46,20 +46,20 @@ function check_go_installation() {
     fi
 }
 
-# 节点安装功能
-function install_node() {
+# 验证节点安装功能
+function install_validator() {
 
     install_nodejs_and_npm
     install_pm2
 
     # 检查curl是否安装，如果没有则安装
     if ! command -v curl > /dev/null; then
-        sudo apt update && sudo apt install curl git -y
+        sudo apt update && sudo apt install curl -y
     fi
 
     # 更新和安装必要的软件
     sudo apt update && sudo apt upgrade -y
-    sudo apt install git wget build-essential jq make lz4 gcc liblz4-tool -y
+    sudo apt install git wget build-essential jq make lz4 gcc -y
 
     # 安装 Go
     if ! check_go_installation; then
@@ -70,10 +70,10 @@ function install_node() {
         go version
     fi
 
-    # 安装所有二进制文件
-    git clone -b v0.3.2 https://github.com/0glabs/0g-chain.git
-    cd 0g-chain
-    make install
+    # 下载二进制文件
+    wget -O 0gchaind https://github.com/0glabs/0g-chain/releases/download/v0.5.0/0gchaind-linux-v0.5.0
+    chmod +x $HOME/0gchaind
+    mv $HOME/0gchaind $HOME/go/bin
     source ~/.profile
 
     # 配置0gchaind
@@ -88,12 +88,12 @@ function install_node() {
 
     # 配置创世文件
     rm ~/.0gchain/config/genesis.json
-    wget -P ~/.0gchain/config https://public-snapshot-storage-develop.s3.ap-southeast-1.amazonaws.com/zerog/zgtendermint_16600-2/genesis.json
+    wget -O $HOME/.0gchain/config/genesis.json https://server-5.itrocket.net/testnet/og/genesis.json
     0gchaind validate-genesis
 
     # 配置节点
-    SEEDS="8f21742ea5487da6e0697ba7d7b36961d3599567@og-testnet-seed.itrocket.net:47656"
-    PEERS="80fa309afab4a35323018ac70a40a446d3ae9caf@og-testnet-peer.itrocket.net:11656,9dbb76298d1625ebcc47d08fa7e7911967b63b61@45.159.221.57:26656,a2caf26a86a4989e26943e496173e7b22831c88a@198.7.116.141:12656,0ae19691f97f5797694c253bc06c79c8b58ea2a8@85.190.242.81:26656,c0d35052a7612d992f721b25f186a5d1f569405e@195.201.194.188:26656,8bd2797c8ece0f099a1c31f98e5648d192d8cd54@38.242.146.162:26656,c85eaa1b3cbe4d7fb19138e5a5dc4111491e6e03@115.78.229.59:10156,fa08f548e8d34b6c72ed9e7495a59ae6be656da8@109.199.97.178:12656,ffdf7a8cc6dbbd22e25b1590f61da149349bdc2e@135.181.229.206:26656,56ee4c337848a70a43887531b5f1ca211bac1a34@185.187.170.125:26656"
+    SEEDS="bac83a636b003495b2aa6bb123d1450c2ab1a364@og-testnet-seed.itrocket.net:47656"
+    PEERS="80fa309afab4a35323018ac70a40a446d3ae9caf@og-testnet-peer.itrocket.net:11656,407e52882cd3e9027c3979742c38f4d655334ee1@185.239.208.65:12656,3b8df79c5322dcb2d25aa8d10f886461fcbb93a5@161.97.89.237:12656,1dd9da1053e932e7c287c94191c418212c96da96@157.173.125.137:26656,1469b5aba1c6401bc191fa5a6fabbc6e02720add@62.171.156.121:12656,af4fe9d510848eb952110da4b03b7ca696d46a3a@84.247.191.112:12656,c30554e3c291acacf327c717beb5c01fc7acf9c1@109.123.253.9:12656,80aead3e238fca6805c37be8b780c99b0e934daf@77.237.246.197:12656,8db25df522e76176b00ab184df972b86bf72cd22@161.97.103.44:12656,e142f3cb55585a1987faa01f5c70de51aa82dd13@31.220.81.231:12656,4a77eb8103ada3687be7038ab722b611acc832be@158.220.111.17:12656,6e9edc59c3a6495bf5769c23fc37dc9756e258d3@161.97.110.78:12656,4ebff8cc1d7fb899643228d367b8e5395b6cb4ca@62.171.189.13:12656,492453098ed9c42e214d5bd3d4bb84113c92571c@89.116.27.67:12656,0f835342124117a4a5f0177c049bf57802de959c@5.252.54.96:47656,c3674c176cf70b8832930bd0c01d57cd1df292ac@161.97.78.57:12656"
     sed -i "s/persistent_peers = \"\"/persistent_peers = \"$PEERS\"/" $HOME/.0gchain/config/config.toml
     sed -i "s/seeds = \"\"/seeds = \"$SEEDS\"/" $HOME/.0gchain/config/config.toml
     sed -i -e 's/max_num_inbound_peers = 40/max_num_inbound_peers = 100/' -e 's/max_num_outbound_peers = 10/max_num_outbound_peers = 100/' $HOME/.0gchain/config/config.toml
@@ -114,7 +114,7 @@ function install_node() {
     # 下载快照
     cp $HOME/.0gchain/data/priv_validator_state.json $HOME/.0gchain/priv_validator_state.json.backup
     rm -rf $HOME/.0gchain/data
-    curl -L https://snapshots.dadunode.com/0gchain/0gchain_latest_tar.lz4 | tar -I lz4 -xf - -C $HOME/.0gchain/data
+    curl -o - -L https://config-t.noders.services/og/data.tar.lz4 | lz4 -d | tar -x -C ~/.0gchain
     mv $HOME/.0gchain/priv_validator_state.json.backup $HOME/.0gchain/data/priv_validator_state.json
 
     # 使用 PM2 启动节点进程
@@ -136,15 +136,15 @@ function view_logs() {
 }
 
 # 卸载节点功能
-function uninstall_node() {
-    echo "你确定要卸载0gchain 节点程序吗？这将会删除所有相关的数据。[Y/N]"
+function uninstall_validator() {
+    echo "你确定要卸载 0gchain 验证节点程序吗？这将会删除所有相关的数据。[Y/N]"
     read -r -p "请确认: " response
 
     case "$response" in
         [yY][eE][sS]|[yY])
             echo "开始卸载节点程序..."
             pm2 stop 0gchaind && pm2 delete 0gchaind
-            rm -rf $HOME/.0gchain $HOME/0gchain $(which 0gchaind) && rm -rf 0g-chain
+            rm -rf $HOME/.0gchain $(which 0gchaind)  $HOME/0g-chain
             echo "节点程序卸载完成。"
             ;;
         *)
@@ -423,7 +423,8 @@ function main_menu() {
         echo "节点社区 Discord 社群:https://discord.gg/GbMV5EcNWF"
         echo "退出脚本，请按键盘ctrl c退出即可"
         echo "请选择要执行的操作:"
-        echo "1. 安装节点"
+        echo "=======================验证节点================================"
+        echo "1. 安装验证节点"
         echo "2. 创建钱包"
         echo "3. 导入钱包"
         echo "4. 查看钱包地址余额"
@@ -434,7 +435,7 @@ function main_menu() {
         echo "9. 创建验证者"
         echo "10. 给自己验证者地址质押代币"
         echo "11. 转换ETH地址"
-        echo "=======================存储节点功能================================"
+        echo "=======================存储节点================================"
         echo "12. 安装存储节点"
         echo "13. 查看存储节点日志"
         echo "14. 过滤错误日志"
@@ -450,14 +451,14 @@ function main_menu() {
         read -p "请输入选项（1-21）: " OPTION
 
         case $OPTION in
-        1) install_node ;;
+        1) install_validator ;;
         2) add_wallet ;;
         3) import_wallet ;;
         4) check_balances ;;
         5) check_sync_status ;;
         6) check_service_status ;;
         7) view_logs ;;
-        8) uninstall_node ;;
+        8) uninstall_validator ;;
         9) add_validator ;;
         10) delegate_self_validator ;;
         11) transfer_EIP ;;
