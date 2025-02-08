@@ -202,10 +202,19 @@ function add_validator() {
     --gas-adjustment=1.4
 }
 
+# 给自己地址验证者质押
+function delegate_self_validator() {
+    read -p "请输入质押代币数量(单位为ua0gai,比如你有1000000个ua0gai，留点水给自己，输入900000回车就行): " math
+    read -p "请输入钱包名称: " wallet_name
+    0gchaind tx staking delegate $(0gchaind keys show $wallet_name --bech val -a) ${math}ua0gi --from $wallet_name   --gas=auto --gas-adjustment=1.4 -y
+
+}
+
+
 function install_storage_node() {
 
     sudo apt-get update
-    sudo apt-get install clang cmake build-essential git screen cargo -y
+    sudo apt-get install clang cmake build-essential git screen openssl pkg-config libssl-dev -y
 
 
     # 安装 Go
@@ -215,12 +224,15 @@ function install_storage_node() {
     export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin
     source $HOME/.bash_profile
 
+    # 安装 rust
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
     # 克隆仓库
-    git clone -b v0.4.2 https://github.com/0glabs/0g-storage-node.git
+    git clone -b v0.8.4 https://github.com/0glabs/0g-storage-node.git
 
     # 进入对应目录构建
     cd 0g-storage-node
+    git checkout 40d4355
     git submodule update --init
 
     # 构建代码
@@ -228,12 +240,9 @@ function install_storage_node() {
     cargo build --release
 
     # 编辑配置
-
-    read -p "请输入你想导入的EVM钱包私钥，不要有0x: " miner_key
-    read -p "请输入设备 IP 地址（本地机器请输入127.0.0.1）: " public_address
-    read -p "请输入使用的 JSON-RPC : " json_rpc
+    read -p "请输入你想导入的EVM钱包私钥，不带0x: " miner_key
+    read -p "请输入使用的 JSON-RPC (官方 https://evmrpc-testnet.0g.ai ): " json_rpc
     sed -i '
-    s|# network_enr_address = ""|network_enr_address = "'$public_address'"|
     s|# blockchain_rpc_endpoint = ".*"|blockchain_rpc_endpoint = "'$json_rpc'"|
     s|# miner_key = ""|miner_key = "'$miner_key'"|
     ' $HOME/0g-storage-node/run/config-testnet-turbo.toml
@@ -242,66 +251,24 @@ function install_storage_node() {
     cd ~/0g-storage-node/run
     screen -dmS zgs_node_session $HOME/0g-storage-node/target/release/zgs_node --config $HOME/0g-storage-node/run/config-testnet-turbo.toml
 
-
-    echo '====================== 安装完成，使用 screen -ls 命令查询即可 ==========================='
-
-}
-
-
-function install_storage_kv() {
-
-    # 克隆仓库
-    git clone https://github.com/0glabs/0g-storage-kv.git
-
-
-    #进入对应目录构建
-    cd 0g-storage-kv
-    git submodule update --init
-
-    # 构建代码
-    cargo build --release
-
-    #后台运行
-    cd run
-
-    echo "请输入RPC节点信息: "
-    read blockchain_rpc_endpoint
-
-
-cat > config.toml <<EOF
-stream_ids = ["000000000000000000000000000000000000000000000000000000000000f2bd", "000000000000000000000000000000000000000000000000000000000000f009", "00000000000000000000000000"]
-
-db_dir = "db"
-kv_db_dir = "kv.DB"
-
-rpc_enabled = true
-rpc_listen_address = "127.0.0.1:6789"
-zgs_node_urls = "http://127.0.0.1:5678"
-
-log_config_file = "log_config"
-
-blockchain_rpc_endpoint = "$blockchain_rpc_endpoint"
-log_contract_address = "0x22C1CaF8cbb671F220789184fda68BfD7eaA2eE1"
-log_sync_start_block_number = 670000
-
-EOF
-
-    echo "配置已成功写入 config.toml 文件"
-    screen -dmS storage_kv ../target/release/zgs_kv --config config.toml
+    echo '====================== 安装完成，使用 screen -ls 命令查询 ==========================='
 
 }
 
-# 给自己地址验证者质押
-function delegate_self_validator() {
-    read -p "请输入质押代币数量(单位为ua0gai,比如你有1000000个ua0gai，留点水给自己，输入900000回车就行): " math
-    read -p "请输入钱包名称: " wallet_name
-    0gchaind tx staking delegate $(0gchaind keys show $wallet_name --bech val -a) ${math}ua0gi --from $wallet_name   --gas=auto --gas-adjustment=1.4 -y
-
+# 检查存储节点同步状态
+function check_storage_status() {
+    while true; do
+    response=$(curl -s -X POST http://localhost:5678 -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"zgs_getStatus","params":[],"id":1}')
+    logSyncHeight=$(echo $response | jq '.result.logSyncHeight')
+    connectedPeers=$(echo $response | jq '.result.connectedPeers')
+    echo -e "Block: \033[32m$logSyncHeight\033[0m, Peers: \033[34m$connectedPeers\033[0m"
+    sleep 5;
+    done
 }
 
 # 查看存储节点日志
 function check_storage_logs() {
-    tail -f "$(find ~/0g-storage-node/run/log/ -type f -printf '%T+ %p\n' | sort -r | head -n 1 | cut -d' ' -f2-)"
+    tail -f -n50 ~/0g-storage-node/run/log/zgs.log.$(TZ=UTC date +%Y-%m-%d)
 }
 
 # 过滤错误日志
@@ -320,32 +287,6 @@ function restart_storage() {
 
 }
 
-# 修改日志等级
-function change_storage_log_level() {
-    echo "DEBUG(1) > INFO(2) > WARN(3) > ERROR(4)"
-    echo "DEBUG 等级日志文件最大，ERROR 等级日志文件最小"
-    read -p "请选择日志等级(1-4): " level
-    case "$level" in
-        1)
-            echo "debug,hyper=info,h2=info" > $HOME/0g-storage-node/run/log_config ;;
-        2)
-            echo "info,hyper=info,h2=info" > $HOME/0g-storage-node/run/log_config ;;
-        3)
-            echo "warn,hyper=info,h2=info" > $HOME/0g-storage-node/run/log_config ;;
-        4)
-            echo "error,hyper=info,h2=info" > $HOME/0g-storage-node/run/log_config ;;
-    esac
-    echo "修改完成，请重新启动存储节点"
-}
-
-
-# 统计日志文件大小
-function storage_logs_disk_usage(){
-    du -sh ~/0g-storage-node/run/log/
-    du -sh ~/0g-storage-node/run/log/*
-}
-
-
 # 删除存储节点日志
 function delete_storage_logs(){
     echo "确定删除存储节点日志？[Y/N]"
@@ -359,22 +300,6 @@ function delete_storage_logs(){
             echo "取消操作"
             ;;
     esac
-
-}
-
-
-# 转换 ETH 地址
-function transfer_EIP() {
-    read -p "请输入你的钱包名称: " wallet_name
-    echo "0x$(0gchaind debug addr $(0gchaind keys show $wallet_name -a) | grep hex | awk '{print $3}')"
-
-}
-
-
-# 导出验证者key
-function export_priv_validator_key() {
-    echo "====================请将下方所有内容备份到自己的记事本或者excel表格中记录==========================================="
-    cat ~/.0gchain/config/priv_validator_key.json
 
 }
 
@@ -393,6 +318,22 @@ function uninstall_storage_node() {
             ;;
     esac
 }
+
+# 转换 ETH 地址
+function transfer_EIP() {
+    read -p "请输入你的钱包名称: " wallet_name
+    echo "0x$(0gchaind debug addr $(0gchaind keys show $wallet_name -a) | grep hex | awk '{print $3}')"
+
+}
+
+
+# 导出验证者key
+function export_priv_validator_key() {
+    echo "====================请将下方所有内容备份到自己的记事本或者excel表格中记录==========================================="
+    cat ~/.0gchain/config/priv_validator_key.json
+
+}
+
 
 function update_script() {
     SCRIPT_PATH="./0g.sh"  # 定义脚本路径
@@ -437,15 +378,14 @@ function main_menu() {
         echo "11. 转换ETH地址"
         echo "=======================存储节点================================"
         echo "12. 安装存储节点"
-        echo "13. 查看存储节点日志"
-        echo "14. 过滤错误日志"
-        echo "15. 重启存储节点"
-        echo "16. 卸载存储节点"
-        echo "17. 修改日志等级"
-        echo "18. 统计日志文件大小"
-        echo "19. 删除存储节点日志"
+        echo "13. 检查存储节点同步状态"
+        echo "14. 查看存储节点日志"
+        echo "15. 过滤错误日志"
+        echo "16. 重启存储节点"
+        echo "17. 卸载存储节点"
+        echo "18. 删除存储节点日志"
         echo "=======================备份功能================================"
-        echo "21. 备份验证者私钥"
+        echo "19. 备份验证者私钥"
         echo "======================================================="
         echo "20. 更新本脚本"
         read -p "请输入选项（1-21）: " OPTION
@@ -463,17 +403,18 @@ function main_menu() {
         10) delegate_self_validator ;;
         11) transfer_EIP ;;
         12) install_storage_node ;;
-        13) check_storage_logs ;;
-        14) check_storage_error;;
-        15) restart_storage ;;
-        16) uninstall_storage_node ;;
-        17) change_storage_log_level ;;
-        18) storage_logs_disk_usage ;;
-        19) delete_storage_logs ;;
+        13) check_storage_status ;;
+        14) check_storage_logs ;;
+        15) check_storage_error;;
+        16) restart_storage ;;
+        17) uninstall_storage_node ;;
+        18) delete_storage_logs ;;
+        19) export_priv_validator_key ;;
         20) update_script ;;
-        21) export_priv_validator_key ;;
+
         *) echo "无效选项。" ;;
         esac
+        
         echo "按任意键返回主菜单..."
         read -n 1
     done
